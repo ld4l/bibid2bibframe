@@ -1,0 +1,19 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Bibid:</strong>
+  <%= @record.bibid %>
+</p>
+
+<p>
+  <strong>Marcxml:</strong>
+  <%= @record.marcxml %>
+</p>
+
+<p>
+  <strong>Rdf:</strong>
+  <%= @record.rdf %>
+</p>
+
+<%= link_to 'Edit', edit_record_path(@record) %> |
+<%= link_to 'Back', records_path %>

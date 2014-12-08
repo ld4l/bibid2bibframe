@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  bibid: 1
+  marcxml: MyText
+  rdf: MyText
+
+two:
+  bibid: 1
+  marcxml: MyText
+  rdf: MyText
