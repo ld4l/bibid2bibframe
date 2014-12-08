@@ -1,2 +1,3 @@
-class Record < ActiveRecord::Base
+class Record 
+  include ActiveModel::Model
 end
