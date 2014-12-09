@@ -1,19 +1,22 @@
 <p id="notice"><%= notice %></p>
 
+<%= @record.inspect %>
+
 <p>
   <strong>Bibid:</strong>
-  <%= @record.bibid %>
+  <%#= @record.bibid %>
 </p>
+
+<%# These need to be disabled form fields %>
 
 <p>
   <strong>Marcxml:</strong>
-  <%= @record.marcxml %>
+  <%#= @record.marcxml %>
 </p>
 
 <p>
   <strong>Rdf:</strong>
-  <%= @record.rdf %>
+  <%#= @record.rdf %>
 </p>
 
-<%= link_to 'Edit', edit_record_path(@record) %> |
-<%= link_to 'Back', records_path %>
+<%= link_to 'Convert another record', records_path %>
