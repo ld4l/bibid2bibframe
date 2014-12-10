@@ -18,7 +18,7 @@ class RecordsControllerTest < ActionController::TestCase
 
   test "should create record" do
     assert_difference('Record.count') do
-      post :create, record: { bibid: @record.bibid, marcxml: @record.marcxml, rdf: @record.rdf }
+      post :create, record: { bibid: @record.bibid, marcxml: @record.marcxml, bibframe: @record.bibframe }
     end
 
     assert_redirected_to record_path(assigns(:record))
@@ -35,7 +35,7 @@ class RecordsControllerTest < ActionController::TestCase
   end
 
   test "should update record" do
-    patch :update, id: @record, record: { bibid: @record.bibid, marcxml: @record.marcxml, rdf: @record.rdf }
+    patch :update, id: @record, record: { bibid: @record.bibid, marcxml: @record.marcxml, bibframe: @record.bibframe }
     assert_redirected_to record_path(assigns(:record))
   end
 

@@ -3,9 +3,9 @@
 one:
   bibid: 1
   marcxml: MyText
-  rdf: MyText
+  bibframe: MyText
 
 two:
   bibid: 1
   marcxml: MyText
-  rdf: MyText
+  bibframe: MyText

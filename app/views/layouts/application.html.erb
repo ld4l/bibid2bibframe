@@ -8,12 +8,14 @@
 </head>
 <body>
 
-<% flash.each do |name, msg| %>
-    <div><%= msg %></div>
-<% end %>
-
-
-<%= yield %>
+  <div id="content">
+  
+    <% flash.each do |name, msg| %>
+      <div><%= msg %></div>
+    <% end %>
+   
+    <%= yield %>
+  </div>
 
 </body>
 </html>

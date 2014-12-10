@@ -1,22 +1,22 @@
+<h1>Cornell bibliographic record</h1>
+
 <p id="notice"><%= notice %></p>
 
-<%= @record.inspect %>
-
-<p>
+<section>
   <strong>Bibid:</strong>
-  <%#= @record.bibid %>
-</p>
+  <%= @record.bibid %>
+</section>
 
-<%# These need to be disabled form fields %>
-
-<p>
-  <strong>Marcxml:</strong>
-  <%#= @record.marcxml %>
-</p>
-
-<p>
-  <strong>Rdf:</strong>
-  <%#= @record.rdf %>
-</p>
+<section id="output">
+  <section class="output" id="marcxml-output">
+    <p><%= label_tag 'marcxml', 'MARCXML:' %></p>     
+    <p><%= text_area_tag 'marcxml', @record.marcxml, readonly: true %></p>
+  </section>
+  
+  <section class="output" id="bibframe-output">
+    <p><%= label_tag 'bibframe', 'BIBFRAME:' %></p>
+    <p><%= text_area_tag 'bibframe', @record.bibframe, readonly: true %></p>
+  </section>    
+</section>
 
 <%= link_to 'Convert another record', records_path %>
