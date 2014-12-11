@@ -11,8 +11,12 @@ section.content {
 }
 
 label, .label {
-  font-weight: bold;
   text-transform: uppercase;
+}
+
+input[type="submit"] {
+  text-transform: uppercase;
+  font-weight: bold;
 }
 
 #new_record {
@@ -37,6 +41,10 @@ label, .label {
 #show {
 
   width: 80%; 
+  
+  label, .label {
+    font-weight: bold;
+  }
   
   #result {
   
