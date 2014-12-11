@@ -1,3 +1,66 @@
-// Place all the styles related to the records controller here.
+// Place all the styles related to the Converter controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
+
+body {
+  margin-left: 3em;
+}
+
+#new_record {
+
+  margin-top: 3em;
+  
+  label {
+    font-weight: bold;
+  }
+  
+  .actions {
+  
+    margin-top: 1.5em;
+    
+    #submit {
+      background-color: gray;
+      color: white;
+      width: 7em;
+      height: 2.5em;
+    }
+  }
+}
+
+#show {
+
+  width: 80%;
+
+  margin-top: 2em; 
+  
+  label, .label {
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+  
+  #result {
+  
+    margin-top: 1em;
+   
+    section.output {
+      float: left;
+      width: 50%;
+      
+      textarea {
+        width: 90%;
+        height: 30em;
+      }
+      
+      #bibframe-output {
+        margin-left: 10%;
+      }
+      
+    } // #result
+    
+  } // section.output
+
+} // #show
+    
+
+
+

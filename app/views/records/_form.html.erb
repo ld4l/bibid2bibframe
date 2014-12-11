@@ -1,6 +1,6 @@
 <%= form_for @record, method: :get, url: convert_records_path do |f| %>
   <% if @record.errors.any? %>
-    <div id="error_explanation">
+    <section id="error_explanation">
       <h2><%= pluralize(@record.errors.count, "error") %> prevented this record from being converted:</h2>
 
       <ul>
@@ -8,14 +8,15 @@
         <li><%= message %></li>
       <% end %>
       </ul>
-    </div>
+    </section>
   <% end %>
 
-  <div class="field">
-    <%= f.label :bibid, 'Enter Cornell bib ID:' %><br>
+  <section class="field">
+    <%= f.label :bibid, 'Enter bib id:' %><br>
     <%= f.text_field :bibid %>
-  </div>
-  <div class="actions">
-    <%= f.submit "Convert" %>
-  </div>
+  </section>
+  <section class="actions">
+    <%= f.submit "Convert", id: :submit %>
+  </section>
+  
 <% end %>

@@ -1,22 +1,25 @@
-<h1>Cornell bibliographic record</h1>
+<h1>Conversion results</h1>
 
-<p id="notice"><%= notice %></p>
-
-<section>
-  <strong>Bibid:</strong>
-  <%= @record.bibid %>
-</section>
-
-<section id="output">
-  <section class="output" id="marcxml-output">
-    <p><%= label_tag 'marcxml', 'MARCXML:' %></p>     
-    <p><%= text_area_tag 'marcxml', @record.marcxml, readonly: true %></p>
+<section id="show" class="content">
+  
+  <section id="bibid">
+    <span class="label">Bibid:</span>
+    <%= @record.bibid %>
   </section>
   
-  <section class="output" id="bibframe-output">
-    <p><%= label_tag 'bibframe', 'BIBFRAME:' %></p>
-    <p><%= text_area_tag 'bibframe', @record.bibframe, readonly: true %></p>
-  </section>    
+  <section id="result">
+    <section class="output" id="marcxml-output">
+      <p><%= label_tag 'marcxml', 'marcxml' %></p>     
+      <p><%= text_area_tag 'marcxml', @record.marcxml, readonly: true %></p>
+    </section>
+    
+    <section class="output" id="bibframe-output">
+      <p><%= label_tag 'bibframe', 'bibframe' %></p>
+      <p><%= text_area_tag 'bibframe', @record.bibframe, readonly: true %></p>
+    </section>    
+  </section>
+  
+  <%= link_to 'Convert another record', records_path %>
+  
 </section>
 
-<%= link_to 'Convert another record', records_path %>
