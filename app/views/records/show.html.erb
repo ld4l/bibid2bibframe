@@ -9,12 +9,12 @@
   
   <section id="result">
     <section class="output" id="marcxml-output">
-      <p><%= label_tag 'marcxml', 'marcxml' %></p>     
+      <p><%= label_tag 'marcxml', 'marcxml:' %></p>     
       <p><%= text_area_tag 'marcxml', @record.marcxml, readonly: true %></p>
     </section>
     
     <section class="output" id="bibframe-output">
-      <p><%= label_tag 'bibframe', 'bibframe' %></p>
+      <p><%= label_tag 'bibframe', 'bibframe:' %></p>
       <p><%= text_area_tag 'bibframe', @record.bibframe, readonly: true %></p>
     </section>    
   </section>
