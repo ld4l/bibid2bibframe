@@ -3,12 +3,18 @@ class RecordsController < ApplicationController
   # GET /records
   # GET /records.json
   def index
-    @record = Record.new
+    @record = Record.new 
   end
   
   # GET /convert_records
   # GET /convert_records.json
   def convert 
+  
+    # WORKS:
+    # http://localhost:3000/records/convert?utf8=%E2%9C%93&record[bibid]=135429&commit=convert
+    #
+    # DOESN'T WORK:
+    # http://localhost:3000/
 
     params = {
       # The application defines its default RDF serialization
@@ -36,7 +42,8 @@ class RecordsController < ApplicationController
       end
     end
   end
-  
+
+ 
   # GET /record
   # GET /record.json
   def show

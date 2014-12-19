@@ -9,11 +9,13 @@ class Record
 
   include ActiveModel::Model
   
-  attr_accessor :bibid, :format, :marcxml, :bibframe, :baseuri
+  # TODO Maybe not all need to be attr_accessor, only attr_reader or attr_writer
+  attr_accessor :bibid, :format, :baseuri, :marcxml, :bibframe 
   
   validates_numericality_of :bibid, only_integer: true, greater_than: 0, message: 'invalid: please enter a positive integer'  
 
-  def initialize config
+
+  def initialize config = {}
     
     # Breaks encapsulation, allowing the caller to determine the object's 
     # attributes
