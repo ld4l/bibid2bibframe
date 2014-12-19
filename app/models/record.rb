@@ -63,7 +63,7 @@ class Record
       
       File.delete(xmlfile)   
     else 
-      @marcxml = 'No catalog record found for bibid ' + @bibid
+       @bibframe = @marcxml = 'No catalog record found for bibid ' + @bibid    
     end
   end
 end
