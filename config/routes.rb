@@ -2,7 +2,6 @@ Rails.application.routes.draw do
 
   # resources :records
   get 'records' => 'records#index'
-  # get 'records/new' => 'records#new', as: :new_record
   get 'records/convert' => 'records#convert', as: :convert_records
   get 'record' => 'records#show'
 

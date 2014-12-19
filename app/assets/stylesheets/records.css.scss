@@ -40,7 +40,7 @@ input[type="submit"] {
 
 #show {
 
-  width: 80%; 
+  //width: 80%; 
   
   label, .label {
     font-weight: bold;
@@ -52,21 +52,25 @@ input[type="submit"] {
    
     section.output {
       float: left;
-      width: 50%;
+      //width: 50%;
       
       textarea {
         width: 90%;
         height: 30em;
         padding: 1em;
       }
-      
-      #bibframe-output {
-        margin-left: 10%;
-      }
-      
-    } // #result
+
+    } // section.output
+ 
+     #marcxml-output {
+      width: 38%;
+    }
     
-  } // section.output
+    #bibframe-output {
+      width: 52%;
+    }   
+    
+  } // #result
 
 } // #show
     

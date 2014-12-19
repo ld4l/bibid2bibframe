@@ -1,12 +1,14 @@
 <h1>Conversion results</h1>
 
 <section id="show" class="content">
-  
-  <section id="bibid">
+
+  <p>
     <span class="label">Bibid:</span>
     <%= @record.bibid %>
-  </section>
+  </p>
   
+  <p><%= link_to 'Convert another record', records_path %></p>
+    
   <section id="result">
     <section class="output" id="marcxml-output">
       <p><%= label_tag 'marcxml', 'marcxml:' %></p>     
@@ -18,8 +20,6 @@
       <p><%= text_area_tag 'bibframe', @record.bibframe, readonly: true %></p>
     </section>    
   </section>
-  
-  <%= link_to 'Convert another record', records_path %>
-  
+ 
 </section>
 
