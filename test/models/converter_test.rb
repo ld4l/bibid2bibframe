@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class RecordTest < ActiveSupport::TestCase
+class ConverterTest < ActiveSupport::TestCase
 
   include ActiveModel::Lint::Tests
 

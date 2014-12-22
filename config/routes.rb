@@ -1,16 +1,16 @@
 Rails.application.routes.draw do
 
-  # resources :records
-  get 'records' => 'records#index'
-  get 'records/convert' => 'records#convert', as: :convert_records
-  get 'record' => 'records#show'
+  # resources :converters
+  get 'converters' => 'converters#index'
+  get 'converters/convert' => 'converters#convert', as: :convert
+  get 'converter' => 'converters#show'
 
   
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 
   # You can have the root of your site routed with "root"
-  root 'records#index'
+  root 'converters#index'
 
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'

@@ -1,10 +1,10 @@
-<%= form_for @record, method: :get, url: convert_records_path do |f| %>
-  <% if @record.errors.any? %>
+<%= form_for @converter, method: :get, url: convert_path do |f| %>
+  <% if @converter.errors.any? %>
     <section id="error_explanation">
-      <h2><%= pluralize(@record.errors.count, "error") %> prevented this record from being converted:</h2>
+      <h2><%= pluralize(@converter.errors.count, "error") %> prevented this conversion:</h2>
 
       <ul>
-      <% @record.errors.full_messages.each do |message| %>
+      <% @converter.errors.full_messages.each do |message| %>
         <li><%= message %></li>
       <% end %>
       </ul>

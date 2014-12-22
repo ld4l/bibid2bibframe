@@ -4,20 +4,20 @@
 
   <p>
     <span class="label">Bibid:</span>
-    <%= @record.bibid %>
+    <%= @converter.bibid %>
   </p>
   
-  <p><%= link_to 'Convert another record', records_path %></p>
+  <p><%= link_to 'Convert again', converters_path %></p>
     
   <section id="result">
     <section class="output" id="marcxml-output">
       <p><%= label_tag 'marcxml', 'marcxml:' %></p>     
-      <p><%= text_area_tag 'marcxml', @record.marcxml, readonly: true %></p>
+      <p><%= text_area_tag 'marcxml', @converter.marcxml, readonly: true %></p>
     </section>
     
     <section class="output" id="bibframe-output">
       <p><%= label_tag 'bibframe', 'bibframe:' %></p>
-      <p><%= text_area_tag 'bibframe', @record.bibframe, readonly: true %></p>
+      <p><%= text_area_tag 'bibframe', @converter.bibframe, readonly: true %></p>
     </section>    
   </section>
  

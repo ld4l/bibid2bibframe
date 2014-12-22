@@ -3,9 +3,14 @@
 # until caching issues are resolved.
 require 'active_model'
 #require 'yaml'
-  
-# Try renaming to Bib2BibframeConverter
-class Record
+
+#  
+# Class name: if we extend the app to other input/output formats, can either
+# add that as an object attribute, in which case no renaming would be necessary, 
+# or create separate classes for each type of conversion 
+# (Marc2BibframeConverter, etc.)
+#
+class Converter
 
   include ActiveModel::Model
   
