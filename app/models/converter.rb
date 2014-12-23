@@ -14,13 +14,23 @@ class Converter
 
   include ActiveModel::Model
   
+  # The LC converter also accepts EXHIBITjson format, but this only works as a
+  # display format managed by the converter itsel.f
+  FORMATS = %w( rdfxml rdfxml-raw ntriples json )
+ 
   # TODO Maybe not all need to be attr_accessor, only attr_reader or attr_writer
-  attr_accessor :bibid, :format, :baseuri, :marcxml, :bibframe 
+  attr_accessor :bibid, :format, :baseuri, :marcxml, :bibframe
+  attr_reader :formats
   
-  validates_numericality_of :bibid, only_integer: true, greater_than: 0, message: 'invalid: please enter a positive integer'  
-
+  # TODO This needs to change when we accept an array of bibids
+  validates_numericality_of :bibid, only_integer: true, greater_than: 0, message: 'invalid: please enter a positive integer' 
+   
+  validates_inclusion_of :format, in: FORMATS, message: "%{value} is not a possible serialization format"
+  
 
   def initialize config = {}
+  
+    @formats = FORMATS
     
     # Breaks encapsulation, allowing the caller to determine the object's 
     # attributes
@@ -63,8 +73,10 @@ class Converter
       # file.
       xmlfile = File.join(Rails.root, 'log','marcxml.xml')
       File.write(xmlfile, @marcxml)  
+      
+      method = @format == 'ntriples' || @format == 'json' ? "'!method=text'" : ''
      
-      @bibframe = %x(java -cp #{saxon} net.sf.saxon.Query #{xquery} marcxmluri=#{xmlfile} baseuri=#{@baseuri} serialization=#{@format})
+      @bibframe = %x(java -cp #{saxon} net.sf.saxon.Query #{method} #{xquery} marcxmluri=#{xmlfile} baseuri=#{@baseuri} serialization=#{@format})
       
       File.delete(xmlfile)   
     else 

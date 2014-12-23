@@ -15,6 +15,12 @@
     <%= f.label :bibid, 'bib id:' %>
     <%= f.text_field :bibid %>
   </section>
+  
+  <section class="field">
+    <%= f.label :format, 'Serialization format:' %>
+    <%= f.select(:format, @converter.formats.map {|format| [format, format]}) %>
+  </section>
+  
   <section class="actions">
     <%= f.submit "convert", id: :submit %>
   </section>

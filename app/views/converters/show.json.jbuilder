@@ -1,1 +1,1 @@
-json.extract! @converters, :bibid, :marcxml, :bibframe
+json.extract! @converter, :bibid, :marcxml, :bibframe

@@ -7,7 +7,12 @@
     <%= @converter.bibid %>
   </p>
   
-  <p><%= link_to 'Convert again', converters_path %></p>
+  <p>
+    <span class="label">Format:</span>
+    <%= @converter.format.upcase %>  
+  </p>
+  
+  <p><%= link_to 'Another conversion', converters_path %></p>
     
   <section id="result">
     <section class="output" id="marcxml-output">

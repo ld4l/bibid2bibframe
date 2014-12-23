@@ -53,7 +53,6 @@ class ConvertersController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def converter_params
-      # TODO add :format here and enable format selection in the UI
-      params.require(:converter).permit(:bibid)
+      params.require(:converter).permit(:bibid, :format)
     end
 end
