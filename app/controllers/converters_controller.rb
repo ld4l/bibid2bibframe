@@ -4,6 +4,7 @@ class ConvertersController < ApplicationController
   # GET /converters.json
   def index    
     @converter = Converter.new params
+    @converter.serialization = 'rdfxml' unless @converter.serialization 
   end
   
   # GET /convert

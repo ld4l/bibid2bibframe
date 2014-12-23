@@ -19,8 +19,9 @@ class Converter
   SERIALIZATION_FORMATS = {
     'rdfxml' => 'RDF/XML',
     'rdfxml-raw' => 'Cascaded RDF/XML',
+    #'turtle' => 'Turtle',
     'ntriples' => 'N-Triples',
-    'json' => 'JSON',
+    'json' => 'JSON',           
   }
  
   # TODO Maybe not all need to be attr_accessor, only attr_reader or attr_writer
@@ -30,7 +31,7 @@ class Converter
   # TODO This needs to change when we accept an array of bibids
   validates_numericality_of :bibid, only_integer: true, greater_than: 0, message: 'invalid: please enter a positive integer' 
    
-  validates_inclusion_of :serialization, in: SERIALIZATION_FORMATS.keys, message: "%{value} is not a possible serialization format"
+  validates_inclusion_of :serialization, in: SERIALIZATION_FORMATS.keys, message: "%{value} is not a valid serialization format"
   
 
   def initialize config = {}
