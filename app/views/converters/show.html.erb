@@ -12,7 +12,7 @@
     <%= @converter.serializations[@converter.serialization] %>  
   </p>
   
-  <p><%= link_to 'Another conversion', converters_path %></p>
+  <p><%= link_to 'Another conversion', converters_path(:serialization => @converter.serialization) %></p>
     
   <section id="result">
     <section class="output" id="marcxml-output">

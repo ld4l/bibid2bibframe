@@ -1,7 +1,6 @@
 Rails.application.routes.draw do
 
   # resources :converters
-  # get 'converters(/:serialization)' => 'converters#index', as: :converters
   get 'converters' => 'converters#index', as: :converters
   get 'converters/convert' => 'converters#convert', as: :convert
   get 'converter' => 'converters#show'

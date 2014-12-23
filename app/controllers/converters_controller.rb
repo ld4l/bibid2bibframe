@@ -3,7 +3,7 @@ class ConvertersController < ApplicationController
   # GET /converters
   # GET /converters.json
   def index    
-    @converter = Converter.new 
+    @converter = Converter.new params
   end
   
   # GET /convert
