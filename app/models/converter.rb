@@ -18,8 +18,8 @@ class Converter
   # display format managed by the converter itself.
   SERIALIZATION_FORMATS = {
     'rdfxml' => 'RDF/XML',
-    'rdfxml-raw' => 'Raw RDF/XML',
-    'ntriples' => 'Ntriples',
+    'rdfxml-raw' => 'Cascaded RDF/XML',
+    'ntriples' => 'N-Triples',
     'json' => 'JSON',
   }
  
