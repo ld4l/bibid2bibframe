@@ -1,10 +1,16 @@
 class ConvertersController < ApplicationController
-
+ 
+  # Define the default RDF serialization for the application.
+  # Note that this should not be left to the model. If there are multiple
+  # converter models for different input formats, we don't want each one to
+  # define its default output serialization.
+  DEFAULT_SERIALIZATION = 'rdfxml'
+    
   # GET /converters
   # GET /converters.json
   def index    
     @converter = Converter.new params
-    @converter.serialization = 'rdfxml' unless @converter.serialization 
+    @converter.serialization = DEFAULT_SERIALIZATION unless @converter.serialization 
   end
   
   # GET /convert
@@ -12,15 +18,8 @@ class ConvertersController < ApplicationController
   def convert 
 
     params = {
-      # The application defines its default RDF serialization
-      # TODO add a form field to select serialization
-      # Valid formats (serializations supported by Bibframe converter):
-      # rdfxml: (default) flattened RDF/XML, everything has an identifier
-      # rdfxml-raw: verbose, cascaded output
-      # ntriples, json, exhibitJSON
-      #
-      :serialization => 'rdfxml',
-      # Might be better to add this to a config file or enter it on the form
+      :serialization => DEFAULT_SERIALIZATION,
+      # TODO Maybe better to add this to a config file or a form input field.
       :baseuri => 'http://ld4l.library.cornell.edu/',     
     }.merge(converter_params).symbolize_keys!
 
@@ -38,6 +37,8 @@ class ConvertersController < ApplicationController
     end
   end
 
+  def show1
+  end
   
   # GET /converter
   # GET /converter.json
