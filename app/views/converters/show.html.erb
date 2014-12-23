@@ -9,7 +9,7 @@
   
   <p>
     <span class="label">Serialization format:</span>
-    <%= @converter.serialization %>  
+    <%= @converter.serializations[@converter.serialization] %>  
   </p>
   
   <p><%= link_to 'Another conversion', converters_path %></p>

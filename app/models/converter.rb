@@ -15,8 +15,13 @@ class Converter
   include ActiveModel::Model
   
   # The LC converter also accepts EXHIBITjson format, but this only works as a
-  # display format managed by the converter itsel.f
-  SERIALIZATION_FORMATS = %w( rdfxml rdfxml-raw ntriples json )
+  # display format managed by the converter itself.
+  SERIALIZATION_FORMATS = {
+    'rdfxml' => 'RDF/XML',
+    'rdfxml-raw' => 'Raw RDF/XML',
+    'ntriples' => 'Ntriples',
+    'json' => 'JSON',
+  }
  
   # TODO Maybe not all need to be attr_accessor, only attr_reader or attr_writer
   attr_accessor :bibid, :serialization, :baseuri, :marcxml, :bibframe
@@ -25,7 +30,7 @@ class Converter
   # TODO This needs to change when we accept an array of bibids
   validates_numericality_of :bibid, only_integer: true, greater_than: 0, message: 'invalid: please enter a positive integer' 
    
-  validates_inclusion_of :serialization, in: SERIALIZATION_FORMATS, message: "%{value} is not a possible serialization format"
+  validates_inclusion_of :serialization, in: SERIALIZATION_FORMATS.keys, message: "%{value} is not a possible serialization format"
   
 
   def initialize config = {}
