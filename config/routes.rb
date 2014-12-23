@@ -1,11 +1,11 @@
 Rails.application.routes.draw do
 
   # resources :converters
-  get 'converters' => 'converters#index'
+  # get 'converters(/:serialization)' => 'converters#index', as: :converters
+  get 'converters' => 'converters#index', as: :converters
   get 'converters/convert' => 'converters#convert', as: :convert
   get 'converter' => 'converters#show'
 
-  
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 

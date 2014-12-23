@@ -18,7 +18,7 @@
   
   <section class="field">
     <%= f.label :format, 'Serialization format:' %>
-    <%= f.select(:format, @converter.formats.map {|format| [format, format]}) %>
+    <%= f.select(:serialization, @converter.serializations.map {|s| [s, s]}) %>
   </section>
   
   <section class="actions">

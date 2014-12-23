@@ -2,19 +2,13 @@ class ConvertersController < ApplicationController
 
   # GET /converters
   # GET /converters.json
-  def index
+  def index    
     @converter = Converter.new 
   end
   
   # GET /convert
   # GET /convert.json
   def convert 
-  
-    # WORKS:
-    # http://localhost:3000/converters/convert?utf8=%E2%9C%93&converter[bibid]=135429&commit=convert
-    #
-    # DOESN'T WORK:
-    # http://localhost:3000/
 
     params = {
       # The application defines its default RDF serialization
@@ -24,7 +18,7 @@ class ConvertersController < ApplicationController
       # rdfxml-raw: verbose, cascaded output
       # ntriples, json, exhibitJSON
       #
-      :format => 'rdfxml',
+      :serialization => 'rdfxml',
       # Might be better to add this to a config file or enter it on the form
       :baseuri => 'http://ld4l.library.cornell.edu/',     
     }.merge(converter_params).symbolize_keys!
@@ -43,7 +37,7 @@ class ConvertersController < ApplicationController
     end
   end
 
- 
+  
   # GET /converter
   # GET /converter.json
   def show
@@ -53,6 +47,6 @@ class ConvertersController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def converter_params
-      params.require(:converter).permit(:bibid, :format)
+      params.require(:converter).permit(:bibid, :serialization)
     end
 end
