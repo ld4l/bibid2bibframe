@@ -102,7 +102,7 @@ class Converter
         rdffile = File.join(tmpdir, 'bibframe.rdf')
         File.write(rdffile, @bibframe)
         turtlefile = File.join(tmpdir, 'bibframe.ttl')
-        File.new(turtlefile, 'r+')
+        File.new(turtlefile, 'w+')
         jarfile = File.join(Rails.root, 'lib', 'rdf2rdf-1.0.1-2.3.1.jar') 
         %x(java -jar #{jarfile} #{rdffile} #{turtlefile})
         @bibframe = File.read turtlefile
