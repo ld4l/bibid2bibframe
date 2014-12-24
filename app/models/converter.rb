@@ -19,7 +19,7 @@ class Converter
   SERIALIZATION_FORMATS = {
     'rdfxml' => 'RDF/XML',
     'rdfxml-raw' => 'Cascaded RDF/XML',
-    #'turtle' => 'Turtle',
+    'turtle' => 'Turtle',
     'ntriples' => 'N-Triples',
     'json' => 'JSON',           
   }
@@ -73,17 +73,43 @@ class Converter
       # Marcxml to Bibframe conversion tools
       saxon = File.join(Rails.root, 'lib', 'saxon', 'saxon9he.jar')
       xquery = File.join(Rails.root, 'lib', 'marc2bibframe', 'xbin', 'saxon.xqy')
-    
+      
+      tmpdir = File.join(Rails.root, 'tmp')
+      
       # The LC Bibframe converter requires retrieving the marcxml from a file
       # rather than a variable, so we must write the result out to a temporary
       # file.
-      xmlfile = File.join(Rails.root, 'log','marcxml.xml')
+      xmlfile = File.join(tmpdir, 'marcxml.xml')
       File.write(xmlfile, @marcxml)  
       
       method = @serialization == 'ntriples' || @serialization == 'json' ? "'!method=text'" : ''
-     
+      
+      turtle = @serialization == 'turtle' ? true : false
+      if turtle 
+        @serialization = 'rdfxml'
+        turtle = true
+      end
+      
       @bibframe = %x(java -cp #{saxon} net.sf.saxon.Query #{method} #{xquery} marcxmluri=#{xmlfile} baseuri=#{@baseuri} serialization=#{@serialization})
       
+      # LC Bibframe converter doesn't support turtle, so write Bibframe rdfxml
+      # to a temporary file, convert to turtle, and read back into @bibframe.
+      # TODO Can we avoid writing out the rdfxml and ttl to files? See
+      # http://www.l3s.de/~minack/rdf2rdf/. Can we use STDIN/STDOUT instead, or
+      # capture contents in variables?
+      if turtle 
+        @serialization = 'turtle'
+        rdffile = File.join(tmpdir, 'bibframe.rdf')
+        File.write(rdffile, @bibframe)
+        turtlefile = File.join(tmpdir, 'bibframe.ttl')
+        File.new(turtlefile, 'r+')
+        jarfile = File.join(Rails.root, 'lib', 'rdf2rdf-1.0.1-2.3.1.jar') 
+        %x(java -jar #{jarfile} #{rdffile} #{turtlefile})
+        @bibframe = File.read turtlefile
+        File.delete(rdffile)
+        File.delete(turtlefile)
+      end
+
       File.delete(xmlfile)   
     else 
        @bibframe = @marcxml = 'No catalog record found for bibid ' + @bibid    
