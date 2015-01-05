@@ -82,7 +82,9 @@ class Converter
       xmlfile = File.join(tmpdir, 'marcxml.xml')
       File.write(xmlfile, @marcxml)  
       
-      method = @serialization == 'ntriples' || @serialization == 'json' ? "'!method=text'" : ''
+      method = (#@serialization == 'turtle' || 
+                @serialization == 'ntriples' || 
+                @serialization == 'json') ? "'!method=text'" : ''
       
       turtle = @serialization == 'turtle' ? true : false
       if turtle 
