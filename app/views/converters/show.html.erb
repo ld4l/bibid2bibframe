@@ -9,7 +9,7 @@
   
   <p>
     <span class="label">Serialization format:</span>
-    <%= @converter.serializations[@converter.serialization] %>  
+    <%= ApplicationHelper::SERIALIZATION_FORMATS[@converter.serialization][:form_label] %>  
   </p>
   
   <p><%= link_to 'Another conversion', converters_path(:serialization => @converter.serialization) %></p>

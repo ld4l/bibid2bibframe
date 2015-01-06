@@ -15,16 +15,13 @@ class Converter
   
   # The LC converter also accepts EXHIBITjson format, but this only works as a
   # display format managed by the converter itself.
-  # TODO The values (human-readable labels for form) should be managed by the 
-  # controller rather than the model. Also include file extension and file 
-  # export serialization label.
-  SERIALIZATION_FORMATS = {
-    'rdfxml' => 'RDF/XML',
-    'rdfxml-raw' => 'Cascaded RDF/XML',
-    #'turtle' => 'Turtle',
-    'ntriples' => 'N-Triples',
-    'json' => 'JSON',           
-  }
+  # There is a conceptual difference between this constant and that defined in 
+  # ApplicationHelper. Here the model defines what formats it accepts, while the
+  # ApplicationHelper defines formats for the views and controllers, including
+  # their human-readable labels. Validation must occur against the model's
+  # valid formats, whereas the application might deal with other formats in
+  # addition.
+  SERIALIZATION_FORMATS = %w(rdfxml rdfxml-raw ntriples json)
  
   # TODO Maybe not all need to be attr_accessor, only attr_reader or attr_writer
   # TEMP - :export shouldn't be a model attribute
@@ -34,7 +31,7 @@ class Converter
   # TODO This needs to change when we accept an array of bibids
   validates_numericality_of :bibid, only_integer: true, greater_than: 0, message: 'invalid: please enter a positive integer' 
    
-  validates_inclusion_of :serialization, in: SERIALIZATION_FORMATS.keys, message: "%{value} is not a valid serialization format"
+  validates_inclusion_of :serialization, in: SERIALIZATION_FORMATS, message: "%{value} is not a valid serialization format"
   
 
   def initialize config = {}

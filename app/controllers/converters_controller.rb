@@ -2,6 +2,7 @@ class ConvertersController < ApplicationController
 
   require 'zip'
 
+
   # Define the default RDF serialization for the application.
   # Note that this should not be left to the model. If there are multiple
   # converter models for different input formats, we don't want each one to
@@ -14,6 +15,7 @@ class ConvertersController < ApplicationController
   # GET /converters.json
   def index  
     @converter = Converter.new params
+    
   end
   
   # GET /convert
@@ -57,6 +59,7 @@ class ConvertersController < ApplicationController
   private
   
     def export
+      # TODO Define a hash to handle these
       case @converter.serialization
         when 'rdfxml', 'rdfxml-raw'
           ext = 'rdf'
@@ -74,11 +77,11 @@ class ConvertersController < ApplicationController
       
       # Filenames
       datetime = Time.now.strftime('%Y%m%d-%H%M%S')
-      marcxml_filename = @converter.bibid + '_' + datetime + '.xml' 
+      marcxml_filename = @converter.bibid + '_marcxml_' + datetime + '.xml' 
       
-      serialization = @converter.serialization == 'rdfxml-raw' ? 'cascaded-rdfxml' : @converter.serialization
-      base_filename = @converter.bibid + '_' + serialization + '_' + datetime
-      bibframe_filename = base_filename + '.' + ext
+      serialization = ApplicationHelper::SERIALIZATION_FORMATS[@converter.serialization]
+      base_filename = @converter.bibid + '_' + serialization[:file_label] + '_' + datetime
+      bibframe_filename = base_filename + '.' + serialization[:file_extension]
       zip_filename = base_filename + '.zip'
 
       tempfile = Tempfile.new('tempfile_' + datetime)
