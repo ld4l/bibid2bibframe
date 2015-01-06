@@ -2,11 +2,6 @@
 # Have tried most online solutions. Temporarily put the converter class here 
 # until caching issues are resolved.
 require 'active_model'
-#require 'yaml'
-
-# require 'rdf'
-# require 'rdf/rdfxml'
-# require 'rdf/turtle'
 
 #  
 # Class name: if we extend the app to other input/output formats, can either
@@ -23,7 +18,7 @@ class Converter
   SERIALIZATION_FORMATS = {
     'rdfxml' => 'RDF/XML',
     'rdfxml-raw' => 'Cascaded RDF/XML',
-    'turtle' => 'Turtle',
+    #'turtle' => 'Turtle',
     'ntriples' => 'N-Triples',
     'json' => 'JSON',           
   }
@@ -86,62 +81,11 @@ class Converter
       xmlfile = File.join(tmpdir, 'marcxml.xml')
       File.write(xmlfile, @marcxml)  
       
-      method = (#@serialization == 'turtle' || 
-                @serialization == 'ntriples' || 
+      method = (@serialization == 'ntriples' || 
                 @serialization == 'json') ? "'!method=text'" : ''
-      
-      turtle = @serialization == 'turtle' ? true : false
-      if turtle 
-        @serialization = 'rdfxml'
-        turtle = true
-      end
       
       @bibframe = %x(java -cp #{saxon} net.sf.saxon.Query #{method} #{xquery} marcxmluri=#{xmlfile} baseuri=#{@baseuri} serialization=#{@serialization})
       
-      # LC Bibframe converter doesn't support turtle, so write Bibframe rdfxml
-      # to a temporary file, convert to turtle, and read back into @bibframe.
-      # TODO Can we avoid writing out the rdfxml and ttl to files? See
-      # http://www.l3s.de/~minack/rdf2rdf/. Can we use STDIN/STDOUT instead, or
-      # capture contents in variables?
-      # Tried Ruby rdf gems, but getting errors.
-      if turtle 
-        @serialization = 'turtle'
-        rdffile = File.join(tmpdir, 'bibframe-' + @bibid + '.rdf')
-        File.write(rdffile, @bibframe)
-        
-        # Method 1: Ruby rdf 
-        #graph = RDF::Graph.load(rdffile) 
-        #@bibframe = graph.to_ttl
-        #File.delete(rdffile)
-        # Testing
-        # turtlefile = File.join(tmpdir, 'bibframe-' + @bibid + '-ruby.ttl')
-        # File.write(turtlefile, @bibframe) 
-       
-        # Method 1a
-        #prefixes = {
-        #  :owl =>  "http://www.w3.org/2002/07/owl#",
-        #  :rdfs => "http://www.w3.org/2000/01/rdf-schema#",
-        #  :rdf => "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-        #  :rdf => RDF.to_uri,
-        #  :xsd =>  "http://www.w3.org/2001/XMLSchema#",
-        #  :relators => "http://id.loc.gov/vocabulary/relators/",
-        #  :madsrdf => "http://www.loc.gov/mads/rdf/v1#",
-        #  :bf => "http://bibframe.org/vocab/"
-        #}
-        #graph = RDF::Graph.load(rdffile)
-        #@bibframe = graph.to_ttl(:prefixes => prefixes)
-        
-        # Method 2: Java rdf2rdf library
-        turtlefile = File.join(tmpdir, 'bibframe-' + @bibid + '-java.ttl')                
-        File.new(turtlefile, 'w+')
-        jarfile = File.join(Rails.root, 'lib', 'rdf2rdf-1.0.1-2.3.1.jar') 
-        %x(java -jar #{jarfile} #{rdffile} #{turtlefile})
-        @bibframe = File.read turtlefile        
-        File.delete(rdffile)
-        # Keep the file for comparison with other conversion tools
-        # File.delete(turtlefile) 
-      end
-
       File.delete(xmlfile)   
     else 
        @bibframe = @marcxml = 'No catalog record found for bibid ' + @bibid    

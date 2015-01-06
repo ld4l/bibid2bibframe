@@ -1,7 +1,7 @@
 <%= form_for @converter, method: :get, url: convert_path do |f| %>
   <% if @converter.errors.any? %>
-    <section id="error_explanation">
-      <h2><%= pluralize(@converter.errors.count, "error") %> prevented this conversion:</h2>
+    <section id='error_explanation'>
+      <h2><%= pluralize(@converter.errors.count, 'error') %> prevented this conversion:</h2>
 
       <ul>
       <% @converter.errors.full_messages.each do |message| %>
@@ -11,18 +11,28 @@
     </section>
   <% end %>
 
-  <section class="field">
+  <section class='field'>
     <%= f.label :bibid, 'bib id:' %>
     <%= f.text_field :bibid %>
   </section>
   
-  <section class="field">
+  <section class='field'>
     <%= f.label :format, 'Serialization format:' %>
     <%= f.select(:serialization, @converter.serializations.map {|serialization, label| [label, serialization]}) %>
   </section>
   
-  <section class="actions">
-    <%= f.submit "convert", id: :submit %>
+  <section class='field'>
+    <%= f.label :download, 'Download file' %>
+    <%# f.check_box :download %>
+  </section>
+
+  <section class='field'>
+    <%= f.label :save, 'Save to triplestore' %>
+    <%# f.check_box :save %>
+  </section>
+    
+  <section class='actions'>
+    <%= f.submit 'convert', id: :submit %>
   </section>
   
 <% end %>
