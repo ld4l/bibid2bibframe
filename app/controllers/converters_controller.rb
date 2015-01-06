@@ -25,11 +25,16 @@ class ConvertersController < ApplicationController
 
     @converter = Converter.new config
 
-    respond_to do |format|
+    respond_to do |format|     
       if @converter.valid?  
         @converter.convert 
-        format.html { render :show }
-        format.json { render :show, status: :created, location: @converter }
+        if @converter.download == '1'
+          # return is necessary to prevent ActionController::UnknownFormat error 
+          download and return 
+        else 
+          format.html { render :show }
+          format.json { render :show, status: :created, location: @converter }
+        end
       else
         format.html { render :index } 
         format.json { render json: @converter.errors, status: :unprocessable_entity }
@@ -37,16 +42,38 @@ class ConvertersController < ApplicationController
     end
   end
 
-  def show1
-  end
+  # Use for testing
+  # def test
+  # end
   
   # GET /converter
   # GET /converter.json
   def show
   end
-
+  
+    
   private
   
+    def download
+      case @converter.serialization
+        when 'rdfxml', 'rdfxml-raw'
+          ext = 'rdf'
+          mime_type = 'application/rdf+xml'
+        when 'ntriples'
+          ext = 'nt'
+          mime_type = 'text/plain'
+        when 'json'
+          ext = 'js' 
+          mime_type = 'application/javascript'
+        # when 'turtle'
+        #   ext = 'ttl'
+        #   mime_type = 'application/x-turtle'      
+      end
+      serialization = @converter.serialization == 'rdfxml-raw' ? 'cascaded-rdfxml' : @converter.serialization
+      filename = @converter.bibid + '_' + serialization + '_' + Time.now.strftime('%Y%m%d-%H%M%S') + '.' + ext
+      send_data @converter.bibframe, filename: filename, type: '', disposition: 'attachment'           
+    end
+ 
     def add_serialization
       params[:serialization] = DEFAULT_SERIALIZATION unless params[:serialization]
       params
@@ -54,6 +81,6 @@ class ConvertersController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def converter_params
-      params.require(:converter).permit(:bibid, :serialization)
+      params.require(:converter).permit(:bibid, :serialization, :download)
     end
 end

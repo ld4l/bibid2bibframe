@@ -24,7 +24,8 @@ class Converter
   }
  
   # TODO Maybe not all need to be attr_accessor, only attr_reader or attr_writer
-  attr_accessor :bibid, :serialization, :baseuri, :marcxml, :bibframe
+  # TEMP - :download shouldn't be a model attribute
+  attr_accessor :bibid, :serialization, :baseuri, :marcxml, :bibframe, :download
   attr_reader :serializations
   
   # TODO This needs to change when we accept an array of bibids
@@ -43,7 +44,7 @@ class Converter
     @baseuri = config[:baseuri]
     @bibid = config[:bibid] 
     @serialization = config[:serialization]
-    
+    @download = config[:download]
     @marcxml = ''
     @bibframe = ''
 
