@@ -25,7 +25,7 @@ class Converter
  
   # TODO Maybe not all need to be attr_accessor, only attr_reader or attr_writer
   # TEMP - :export shouldn't be a model attribute
-  attr_accessor :bibid, :serialization, :baseuri, :marcxml, :bibframe, :export
+  attr_accessor :bibid, :serialization, :baseuri, :marcxml, :bibframe
   
   # TODO This needs to change when we accept an array of bibids
   validates_numericality_of :bibid, only_integer: true, greater_than: 0, message: 'invalid: please enter a positive integer' 
@@ -41,7 +41,6 @@ class Converter
     @baseuri = config[:baseuri]
     @bibid = config[:bibid] 
     @serialization = config[:serialization]
-    @export = config[:export]
     @marcxml = ''
     @bibframe = ''
 

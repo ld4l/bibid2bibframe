@@ -21,18 +21,20 @@ class ConvertersController < ApplicationController
   # GET /convert
   # GET /convert.json
   def convert 
-
+    
     config = {
       # TODO Maybe better to add this to a config file or a form input field.
       :baseuri => 'http://ld4l.library.cornell.edu/',     
-    }.merge(converter_params).symbolize_keys!
+    }.merge(safe_params).symbolize_keys!
 
     @converter = Converter.new config
 
     respond_to do |format|     
       if @converter.valid?  
         @converter.convert 
-        if @converter.export == '1'
+        # TODO Why doesn't it work to refer to safe_params here?
+        # Or copy safe_params to a variable
+        if params[:export] == '1'
           # return is necessary to prevent ActionController::UnknownFormat error 
           export and return 
         else 
@@ -87,7 +89,7 @@ class ConvertersController < ApplicationController
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.
-    def converter_params
+    def safe_params
       params.require(:converter).permit(:bibid, :serialization, :export)
     end
 end
