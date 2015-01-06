@@ -1,5 +1,7 @@
 class ConvertersController < ApplicationController
 
+  require 'zip'
+
   # Define the default RDF serialization for the application.
   # Note that this should not be left to the model. If there are multiple
   # converter models for different input formats, we don't want each one to
@@ -69,10 +71,26 @@ class ConvertersController < ApplicationController
         #   ext = 'ttl'
         #   mime_type = 'application/x-turtle'      
       end
-      serialization = @converter.serialization == 'rdfxml-raw' ? 'cascaded-rdfxml' : @converter.serialization
-      filename = @converter.bibid + '_' + serialization + '_' + Time.now.strftime('%Y%m%d-%H%M%S') + '.' + ext
       
-      send_data @converter.bibframe, filename: filename, type: '', disposition: 'attachment'           
+      # Filenames
+      datetime = Time.now.strftime('%Y%m%d-%H%M%S')
+      marcxml_filename = @converter.bibid + '_' + datetime + '.xml' 
+      
+      serialization = @converter.serialization == 'rdfxml-raw' ? 'cascaded-rdfxml' : @converter.serialization
+      base_filename = @converter.bibid + '_' + serialization + '_' + datetime
+      bibframe_filename = base_filename + '.' + ext
+      zip_filename = base_filename + '.zip'
+
+      tempfile = Tempfile.new('tempfile_' + datetime)
+      Zip::OutputStream.open(tempfile.path) do |zip|
+        zip.put_next_entry(marcxml_filename)
+        zip.print @converter.marcxml
+        
+        zip.put_next_entry(bibframe_filename)
+        zip.print @converter.bibframe
+      end     
+      
+      send_file tempfile.path, filename: zip_filename, type: 'application/zip', disposition: 'attachment'           
     end
  
     def add_serialization

@@ -26,11 +26,6 @@ gem 'sdoc', '~> 0.4.0',          group: :doc
 # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
 gem 'spring',        group: :development
 
-gem 'linkeddata', '~> 1.1.2'
-# gem 'rdf', '~> 1.1.7'
-# gem 'rdf-turtle', '~> 1.1.5'
-# gem 'rdf-rdfxml', '~> 1.1.3'
-
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 
@@ -43,3 +38,8 @@ gem 'linkeddata', '~> 1.1.2'
 # Use debugger
 # gem 'debugger', group: [:development, :test]
 
+gem 'rubyzip', '~>1.1.6'
+
+# gem 'rdf', '~> 1.1.7'
+# gem 'rdf-turtle', '~> 1.1.5'
+# gem 'rdf-rdfxml', '~> 1.1.3'
