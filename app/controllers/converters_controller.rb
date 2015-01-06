@@ -59,22 +59,7 @@ class ConvertersController < ApplicationController
   private
   
     def export
-      # TODO Define a hash to handle these
-      case @converter.serialization
-        when 'rdfxml', 'rdfxml-raw'
-          ext = 'rdf'
-          mime_type = 'application/rdf+xml'
-        when 'ntriples'
-          ext = 'nt'
-          mime_type = 'text/plain'
-        when 'json'
-          ext = 'js' 
-          mime_type = 'application/javascript'
-        # when 'turtle'
-        #   ext = 'ttl'
-        #   mime_type = 'application/x-turtle'      
-      end
-      
+
       # Filenames
       datetime = Time.now.strftime('%Y%m%d-%H%M%S')
       marcxml_filename = @converter.bibid + '_marcxml_' + datetime + '.xml' 
