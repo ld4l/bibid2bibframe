@@ -4,6 +4,10 @@
 require 'active_model'
 #require 'yaml'
 
+# require 'rdf'
+# require 'rdf/rdfxml'
+# require 'rdf/turtle'
+
 #  
 # Class name: if we extend the app to other input/output formats, can either
 # add that as an object attribute, in which case no renaming would be necessary, 
@@ -99,17 +103,43 @@ class Converter
       # TODO Can we avoid writing out the rdfxml and ttl to files? See
       # http://www.l3s.de/~minack/rdf2rdf/. Can we use STDIN/STDOUT instead, or
       # capture contents in variables?
+      # Tried Ruby rdf gems, but getting errors.
       if turtle 
         @serialization = 'turtle'
-        rdffile = File.join(tmpdir, 'bibframe.rdf')
+        rdffile = File.join(tmpdir, 'bibframe-' + @bibid + '.rdf')
         File.write(rdffile, @bibframe)
-        turtlefile = File.join(tmpdir, 'bibframe.ttl')
+        
+        # Method 1: Ruby rdf 
+        #graph = RDF::Graph.load(rdffile) 
+        #@bibframe = graph.to_ttl
+        #File.delete(rdffile)
+        # Testing
+        # turtlefile = File.join(tmpdir, 'bibframe-' + @bibid + '-ruby.ttl')
+        # File.write(turtlefile, @bibframe) 
+       
+        # Method 1a
+        #prefixes = {
+        #  :owl =>  "http://www.w3.org/2002/07/owl#",
+        #  :rdfs => "http://www.w3.org/2000/01/rdf-schema#",
+        #  :rdf => "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+        #  :rdf => RDF.to_uri,
+        #  :xsd =>  "http://www.w3.org/2001/XMLSchema#",
+        #  :relators => "http://id.loc.gov/vocabulary/relators/",
+        #  :madsrdf => "http://www.loc.gov/mads/rdf/v1#",
+        #  :bf => "http://bibframe.org/vocab/"
+        #}
+        #graph = RDF::Graph.load(rdffile)
+        #@bibframe = graph.to_ttl(:prefixes => prefixes)
+        
+        # Method 2: Java rdf2rdf library
+        turtlefile = File.join(tmpdir, 'bibframe-' + @bibid + '-java.ttl')                
         File.new(turtlefile, 'w+')
         jarfile = File.join(Rails.root, 'lib', 'rdf2rdf-1.0.1-2.3.1.jar') 
         %x(java -jar #{jarfile} #{rdffile} #{turtlefile})
-        @bibframe = File.read turtlefile
+        @bibframe = File.read turtlefile        
         File.delete(rdffile)
-        File.delete(turtlefile)
+        # Keep the file for comparison with other conversion tools
+        # File.delete(turtlefile) 
       end
 
       File.delete(xmlfile)   
