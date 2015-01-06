@@ -15,6 +15,9 @@ class Converter
   
   # The LC converter also accepts EXHIBITjson format, but this only works as a
   # display format managed by the converter itself.
+  # TODO The values (human-readable labels for form) should be managed by the 
+  # controller rather than the model. Also include file extension and file 
+  # download serialization label.
   SERIALIZATION_FORMATS = {
     'rdfxml' => 'RDF/XML',
     'rdfxml-raw' => 'Cascaded RDF/XML',
