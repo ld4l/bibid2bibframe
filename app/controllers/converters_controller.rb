@@ -71,6 +71,7 @@ class ConvertersController < ApplicationController
       end
       serialization = @converter.serialization == 'rdfxml-raw' ? 'cascaded-rdfxml' : @converter.serialization
       filename = @converter.bibid + '_' + serialization + '_' + Time.now.strftime('%Y%m%d-%H%M%S') + '.' + ext
+      
       send_data @converter.bibframe, filename: filename, type: '', disposition: 'attachment'           
     end
  
@@ -81,6 +82,6 @@ class ConvertersController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def converter_params
-      params.require(:converter).permit(:bibid, :serialization, :download)
+      params.require(:converter).permit(:bibid, :serialization, :export)
     end
 end
