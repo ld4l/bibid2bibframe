@@ -28,9 +28,9 @@ class ConvertersController < ApplicationController
     respond_to do |format|     
       if @converter.valid?  
         @converter.convert 
-        if @converter.download == '1'
+        if @converter.export == '1'
           # return is necessary to prevent ActionController::UnknownFormat error 
-          download and return 
+          export and return 
         else 
           format.html { render :show }
           format.json { render :show, status: :created, location: @converter }
@@ -54,7 +54,7 @@ class ConvertersController < ApplicationController
     
   private
   
-    def download
+    def export
       case @converter.serialization
         when 'rdfxml', 'rdfxml-raw'
           ext = 'rdf'

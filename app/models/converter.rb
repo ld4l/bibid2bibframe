@@ -17,7 +17,7 @@ class Converter
   # display format managed by the converter itself.
   # TODO The values (human-readable labels for form) should be managed by the 
   # controller rather than the model. Also include file extension and file 
-  # download serialization label.
+  # export serialization label.
   SERIALIZATION_FORMATS = {
     'rdfxml' => 'RDF/XML',
     'rdfxml-raw' => 'Cascaded RDF/XML',
@@ -27,8 +27,8 @@ class Converter
   }
  
   # TODO Maybe not all need to be attr_accessor, only attr_reader or attr_writer
-  # TEMP - :download shouldn't be a model attribute
-  attr_accessor :bibid, :serialization, :baseuri, :marcxml, :bibframe, :download
+  # TEMP - :export shouldn't be a model attribute
+  attr_accessor :bibid, :serialization, :baseuri, :marcxml, :bibframe, :export
   attr_reader :serializations
   
   # TODO This needs to change when we accept an array of bibids
@@ -47,7 +47,7 @@ class Converter
     @baseuri = config[:baseuri]
     @bibid = config[:bibid] 
     @serialization = config[:serialization]
-    @download = config[:download]
+    @export = config[:export]
     @marcxml = ''
     @bibframe = ''
 
