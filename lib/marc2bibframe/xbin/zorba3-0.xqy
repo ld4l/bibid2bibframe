@@ -16,6 +16,8 @@ xquery version "3.0";
 :   Module Overview:     Transforms MARC/XML Bibliographic records
 :       to RDF conforming to the BIBFRAME model.  Outputs RDF/XML,
 :       N-triples, or JSON.
+
+:  adding holdings capability; allow <marcxml:collection> with multiple records,some holdigns, related to bibs on 004
 :
 :   Run: zorba -i -q file:///location/of/zorba.xqy -e marcxmluri:="http://location/of/marcxml.xml" -e serialization:="rdfxml" -e baseuri:="http://your-base-uri/"
 :   Run: zorba -i -q file:///location/of/zorba.xqy -e marcxmluri:="../location/of/marcxml.xml" -e serialization:="rdfxml" -e baseuri:="http://your-base-uri/"
@@ -26,8 +28,9 @@ xquery version "3.0";
 :   to RDF conforming to the BIBFRAME model.  Outputs RDF/XML,
 :   N-triples, or JSON.
 :
+:   @author Nate Trail (ntra@loc.gov)
 :   @author Kevin Ford (kefo@loc.gov)
-:   @since December 03, 2012
+:   @since December 17, 2014
 :   @version 1.0
 :)
 
@@ -211,7 +214,7 @@ declare %an:sequential function local:resolve-labels(
     
     return <rdf:RDF>{$resources}</rdf:RDF>
 };
-
+let $usebnodes:= if ($usebnodes="") then "false" else $usebnodes
 let $startDT := fn:current-dateTime()
 let $logfilename := fn:replace(fn:substring-before(xs:string($startDT), "."), "-|:", "")
 let $logfilename := fn:concat($logdir, $logfilename, '.log.xml')
@@ -233,13 +236,23 @@ let $marcxml :=
         return $mxml
 let $marcxml := $marcxml//marcxml:record
 
+   
+   
+
+
 let $result :=
-    for $r in $marcxml
+    (:for $r in $marcxml:)
+    for $r in $marcxml[@type="Bibliographic" or fn:not(@type)]
     let $controlnum := xs:string($r/marcxml:controlfield[@tag eq "001"][1])
+    let $holds:=
+        for $hold in $marcxml[fn:string(marcxml:controlfield[@tag="004"])=$controlnum]
+            return $hold
+  
     let $httpuri := fn:concat($baseuri , $controlnum)
+     let $recordset:= element marcxml:collection{$r,$holds}
     let $r :=  
         try {
-            let $rdf := marcbib2bibframe:marcbib2bibframe($r,$httpuri)
+            let $rdf := marcbib2bibframe:marcbib2bibframe($recordset,$httpuri)
             let $o := $rdf/child::node()[fn:name()]
             let $logmsg := 
                 element log:success {

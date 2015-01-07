@@ -24,8 +24,10 @@ xquery version "1.0";
 :   to RDF conforming to the BIBFRAME model.  Outputs RDF/XML,
 :   N-triples, or JSON.
 :
+:  adding holdings capability; allow <marcxml:collection> with multiple records,some holdings, related to bibs on 004
+
 :   @author Kevin Ford (kefo@loc.gov)
-:   @since December 03, 2012
+:   @since December 17, 2014
 :   @version 1.0
 :)
 
@@ -86,12 +88,20 @@ let $marcxml :=
     else
         //marcxml:record
 
+let $usebnodes:= if ($usebnodes="") then "false" else $usebnodes
 
 let $resources :=
-    for $r in $marcxml
+    (:for $r in $marcxml:)
+    for $r in $marcxml[@type="Bibliographic" or fn:not(@type)]
+
     let $controlnum := xs:string($r/marcxml:controlfield[@tag eq "001"][1])
+    let $holds:=
+        for $hold in $marcxml[fn:string(marcxml:controlfield[@tag="004"])=$controlnum]
+            return $hold
+
     let $httpuri := fn:concat($baseuri , $controlnum)
-    let $bibframe :=  marcbib2bibframe:marcbib2bibframe($r,$httpuri)
+    let $recordset:= element marcxml:collection{$r,$holds}
+    let $bibframe :=  marcbib2bibframe:marcbib2bibframe($recordset,$httpuri)
     return $bibframe/child::node()[fn:name()]
     
 let $rdfxml-raw := 
