@@ -21,7 +21,7 @@ class Converter
   # their human-readable labels. Validation must occur against the model's
   # valid formats, whereas the application might deal with other formats in
   # addition.
-  SERIALIZATION_FORMATS = %w(rdfxml rdfxml-raw ntriples json)
+  SERIALIZATION_FORMATS = %w(json ntriples rdfxml rdfxml-raw turtle)
  
   # TODO Maybe not all need to be attr_accessor, only attr_reader or attr_writer
   # TEMP - :export shouldn't be a model attribute
@@ -80,9 +80,34 @@ class Converter
       
       method = (@serialization == 'ntriples' || 
                 @serialization == 'json') ? "'!method=text'" : ''
-      
+
+      turtle = @serialization == 'turtle' ? true : false
+      if turtle 
+        @serialization = 'rdfxml'
+        turtle = true
+      end
+           
       @bibframe = %x(java -cp #{saxon} net.sf.saxon.Query #{method} #{xquery} marcxmluri=#{xmlfile} baseuri=#{@baseuri} serialization=#{@serialization})
-      
+
+      # LC Bibframe converter doesn't support turtle, so write Bibframe rdfxml
+      # to a temporary file, convert to turtle, and read back into @bibframe.
+      # TODO Can we avoid writing out the rdfxml and ttl to files? Try using
+      # Tempfile class instead (see ConvertersController#export). Tried Ruby
+      # rdf gems but it's not straightforward to get all prefixes into the
+      # turtle.
+      if turtle 
+        @serialization = 'turtle'
+        rdffile = File.join(tmpdir, 'bibframe.rdf')
+        File.write(rdffile, @bibframe)
+        turtlefile = File.join(tmpdir, 'bibframe.ttl')
+        File.new(turtlefile, 'w+')
+        jarfile = File.join(Rails.root, 'lib', 'rdf2rdf-1.0.1-2.3.1.jar') 
+        %x(java -jar #{jarfile} #{rdffile} #{turtlefile})
+        @bibframe = File.read turtlefile
+        File.delete(rdffile)
+        File.delete(turtlefile)
+      end
+            
       File.delete(xmlfile)   
     else 
        @bibframe = @marcxml = 'No catalog record found for bibid ' + @bibid    
