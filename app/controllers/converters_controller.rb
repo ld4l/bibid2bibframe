@@ -9,7 +9,7 @@ class ConvertersController < ApplicationController
   # define its default output serialization.
   DEFAULT_SERIALIZATION = 'rdfxml'
   
-  before_action :add_serialization, only: [:index]
+  before_action :set_serialization, only: [:index]
     
   # GET /converters
   # GET /converters.json
@@ -23,17 +23,17 @@ class ConvertersController < ApplicationController
   def convert 
     
     config = {
-      # TODO Maybe better to add this to a config file or a form input field.
+      # TODO Better to add this to a config file or a form input field, or
+      # both, with the form field overriding the default from the config file.
       :baseuri => 'http://ld4l.library.cornell.edu/',     
-    }.merge(safe_params).symbolize_keys!
+    }.merge(converter_params).symbolize_keys!
 
+    
     @converter = Converter.new config
 
     respond_to do |format|     
       if @converter.valid?  
         @converter.convert 
-        # TODO Why doesn't it work to refer to safe_params here?
-        # Or copy safe_params to a variable
         if params[:export] == '1'
           # return is necessary to prevent ActionController::UnknownFormat error 
           export and return 
@@ -83,13 +83,12 @@ class ConvertersController < ApplicationController
       send_file tempfile.path, filename: zip_filename, type: 'application/zip', disposition: 'attachment'           
     end
  
-    def add_serialization
-      params[:serialization] = DEFAULT_SERIALIZATION unless params[:serialization]
-      params
+    def set_serialization
+      params[:serialization] ||= DEFAULT_SERIALIZATION
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.
-    def safe_params
-      params.require(:converter).permit(:bibid, :serialization, :export)
+    def converter_params
+      params.require(:converter).permit(:bibid, :serialization)
     end
 end
