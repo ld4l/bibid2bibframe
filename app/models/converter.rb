@@ -70,13 +70,13 @@ class Converter
       saxon = File.join(Rails.root, 'lib', 'saxon', 'saxon9he.jar')
       xquery = File.join(Rails.root, 'lib', 'marc2bibframe', 'xbin', 'saxon.xqy')
       
-      tmpdir = File.join(Rails.root, 'tmp')
+      #tmpdir = File.join(Rails.root, 'tmp')
       
       # The LC Bibframe converter requires retrieving the marcxml from a file
       # rather than a variable, so we must write the result out to a temporary
       # file.
-      xmlfile = File.join(tmpdir, 'marcxml.xml')
-      File.write(xmlfile, @marcxml)  
+      marcxml_file = Tempfile.new ['bib2bibframe-convert-marcxml-', '.xml'] 
+      File.write(marcxml_file, @marcxml)  
       
       method = (@serialization == 'ntriples' || 
                 @serialization == 'json') ? "'!method=text'" : ''
@@ -87,7 +87,7 @@ class Converter
         turtle = true
       end
            
-      @bibframe = %x(java -cp #{saxon} net.sf.saxon.Query #{method} #{xquery} marcxmluri=#{xmlfile} baseuri=#{@baseuri} serialization=#{@serialization})
+      @bibframe = %x(java -cp #{saxon} net.sf.saxon.Query #{method} #{xquery} marcxmluri=#{marcxml_file.path} baseuri=#{@baseuri} serialization=#{@serialization})
 
       # LC Bibframe converter doesn't support turtle, so write Bibframe rdfxml
       # to a temporary file, convert to turtle, and read back into @bibframe.
@@ -97,18 +97,17 @@ class Converter
       # turtle.
       if turtle 
         @serialization = 'turtle'
-        rdffile = File.join(tmpdir, 'bibframe.rdf')
-        File.write(rdffile, @bibframe)
-        turtlefile = File.join(tmpdir, 'bibframe.ttl')
-        File.new(turtlefile, 'w+')
+        rdfxml_file = Tempfile.new ['bib2bibframe-convert-rdfxml-', '.rdf']
+        File.write(rdfxml_file, @bibframe)
+        turtle_file = Tempfile.new ['bib2bibframe-convert-ttl-', '.ttl'] 
         jarfile = File.join(Rails.root, 'lib', 'rdf2rdf-1.0.1-2.3.1.jar') 
-        %x(java -jar #{jarfile} #{rdffile} #{turtlefile})
-        @bibframe = File.read turtlefile
-        File.delete(rdffile)
-        File.delete(turtlefile)
+        @bibframe = %x(java -jar #{jarfile} #{rdfxml_file.path} #{turtle_file.path})
+        @bibframe = File.read turtle_file
+        rdfxml_file.close!
+        turtle_file.close!
       end
-            
-      File.delete(xmlfile)   
+             
+      marcxml_file.close!
     else 
        @bibframe = @marcxml = 'No catalog record found for bibid ' + @bibid    
     end
