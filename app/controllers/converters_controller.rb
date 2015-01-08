@@ -86,7 +86,8 @@ class ConvertersController < ApplicationController
         tempfile.close
         # Can't do this: file gets deleted before being offered for download. 
         # Doesn't work in an after_action (even if tempfile is stored in an
-        # instance variable).
+        # instance variable). Ruby's garbage collection should handle deletion
+        # (although stdlib doc recommends explicit deletion anyway).
         # tempfile.unlink
       end
     end
