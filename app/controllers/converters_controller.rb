@@ -2,7 +2,6 @@ class ConvertersController < ApplicationController
 
   require 'zip'
 
-
   # Define the default RDF serialization for the application.
   # Note that this should not be left to the model. If there are multiple
   # converter models for different input formats, we don't want each one to
@@ -71,18 +70,27 @@ class ConvertersController < ApplicationController
       bibframe_filename = base_filename + '.' + serialization[:file_extension]
       zip_filename = base_filename + '.zip'
 
-      tempfile = Tempfile.new('tempfile_' + datetime)
-      Zip::OutputStream.open(tempfile.path) do |zip|
-        zip.put_next_entry(marcxml_filename)
-        zip.print @converter.marcxml
+      tempfile = Tempfile.new('bib2bibframe-export-')
         
-        zip.put_next_entry(bibframe_filename)
-        zip.print @converter.bibframe
-      end     
-      
-      send_file tempfile.path, filename: zip_filename, type: 'application/zip', disposition: 'attachment'           
+      begin
+        Zip::OutputStream.open(tempfile.path) do |zip|
+          zip.put_next_entry(marcxml_filename)
+          zip.print @converter.marcxml
+          
+          zip.put_next_entry(bibframe_filename)
+          zip.print @converter.bibframe
+        end     
+
+        send_file tempfile.path, filename: zip_filename, type: 'application/zip', disposition: 'attachment'       
+      ensure
+        tempfile.close
+        # Can't do this: file gets deleted before being offered for download. 
+        # Doesn't work in an after_action (even if tempfile is stored in an
+        # instance variable).
+        # tempfile.unlink
+      end
     end
- 
+
     def set_serialization
       params[:serialization] ||= DEFAULT_SERIALIZATION
     end
