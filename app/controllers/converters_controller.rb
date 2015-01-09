@@ -25,7 +25,7 @@ class ConvertersController < ApplicationController
       # TODO Better to add this to a config file or a form input field, or
       # both, with the form field overriding the default from the config file.
       :baseuri => 'http://ld4l.library.cornell.edu/',     
-    }.merge(converter_params).symbolize_keys!
+    }.merge(safe_params).symbolize_keys!
 
     
     @converter = Converter.new config
@@ -97,7 +97,9 @@ class ConvertersController < ApplicationController
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.
-    def converter_params
+    def safe_params
+      # TODO How to limit the params that aren't within the converter scope? 
+      # We should accept only :export.
       params.require(:converter).permit(:bibid, :serialization)
     end
 end
