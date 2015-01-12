@@ -13,8 +13,7 @@ class ConvertersController < ApplicationController
   # GET /converters
   # GET /converters.json
   def index  
-    @converter = Converter.new params
-    
+    @converter = Converter.new params   
   end
   
   # GET /convert
@@ -25,9 +24,8 @@ class ConvertersController < ApplicationController
       # TODO Better to add this to a config file or a form input field, or
       # both, with the form field overriding the default from the config file.
       :baseuri => 'http://ld4l.library.cornell.edu/',     
-    }.merge(safe_params).symbolize_keys!
-
-    
+    }.merge(converter_params).symbolize_keys!
+  
     @converter = Converter.new config
 
     respond_to do |format|     
@@ -61,7 +59,7 @@ class ConvertersController < ApplicationController
   
     def export
 
-      # Filenames
+      # Set filenames
       datetime = Time.now.strftime('%Y%m%d-%H%M%S')
       marcxml_filename = @converter.bibid + '_marcxml_' + datetime + '.xml' 
       
@@ -96,10 +94,9 @@ class ConvertersController < ApplicationController
       params[:serialization] ||= DEFAULT_SERIALIZATION
     end
 
-    # Never trust parameters from the scary internet, only allow the white list through.
-    def safe_params
-      # TODO How to limit the params that aren't within the converter scope? 
-      # We should accept only :export.
+    # Whitelist allowable params sent to the converter model as a security 
+    # measure
+    def converter_params
       params.require(:converter).permit(:bibid, :serialization)
     end
 end

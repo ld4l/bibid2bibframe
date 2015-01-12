@@ -13,18 +13,18 @@ class Converter
 
   include ActiveModel::Model
   
-  # The LC converter also accepts EXHIBITjson format, but this only works as a
-  # display format managed by the converter itself.
+
   # There is a conceptual difference between this constant and that defined in 
   # ApplicationHelper. Here the model defines what formats it accepts, while the
   # ApplicationHelper defines formats for the views and controllers, including
   # their human-readable labels. Validation must occur against the model's
   # valid formats, whereas the application might deal with other formats in
   # addition.
+  # The LC converter also accepts EXHIBITjson format, but this only works as a
+  # display format managed by the converter itself.
   SERIALIZATION_FORMATS = %w(json ntriples rdfxml rdfxml-raw turtle)
  
   # TODO Maybe not all need to be attr_accessor, only attr_reader or attr_writer
-  # TEMP - :export shouldn't be a model attribute
   attr_accessor :bibid, :serialization, :baseuri, :marcxml, :bibframe
   
   # TODO This needs to change when we accept an array of bibids
@@ -32,7 +32,7 @@ class Converter
    
   validates_inclusion_of :serialization, in: SERIALIZATION_FORMATS, message: "%{value} is not a valid serialization format"
   
-
+  
   def initialize config = {}
     
     # Breaks encapsulation, allowing the caller to determine the object's 
