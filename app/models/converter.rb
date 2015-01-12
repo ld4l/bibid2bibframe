@@ -31,18 +31,36 @@ class Converter
    
   validates_inclusion_of :serialization, in: SERIALIZATION_FORMATS, message: "%{value} is not a valid serialization format"
   
+  validate :bibid_in_catalog
+  
   
   def initialize config = {}
-    
+
     # Breaks encapsulation, allowing the caller to determine the object's 
     # attributes
     # config.each {|k,v| instance_variable_set("@#{k}",v)}
     @baseuri = config[:baseuri]
     @bibid = config[:bibid] 
     @serialization = config[:serialization]
-    @marcxml = ''
     @bibframe = ''
 
+  end
+  
+  def bibid_in_catalog
+  
+    # Don't look up bibid in catalog unless other validations have passed
+    if errors.empty?
+
+      # TODO Make the search url a config option? Could then be generalized to 
+      # other catalogs, if the support the .marcxml extension
+      @marcxml = %x(curl -s http://newcatalog.library.cornell.edu/catalog/#{@bibid}.marcxml)
+      
+      if (! @marcxml.start_with?('<record'))    
+        errors.add :bibid, 'invalid: not found in the catalog'
+      end
+    
+    end
+  
   end
 
   # TODO Add logging: set up logs (hard-coded initially, maybe later a config
@@ -52,15 +70,11 @@ class Converter
   # accumulate data in the log arrays, though.
 
   def convert
-    
-    # TODO Make the search url a config option? Could then be generalized to 
-    # other catalogs, if the support the .marcxml extension
-    marcxml = %x(curl -s http://newcatalog.library.cornell.edu/catalog/#{@bibid}.marcxml)
 
-    if (marcxml.start_with?('<record'))
+    #if (marcxml.start_with?('<record'))
 
-      marcxml << marcxml.gsub(/<record xmlns='http:\/\/www.loc.gov\/MARC21\/slim'>/, '<record>') 
-      marcxml = "<?xml version='1.0' encoding='UTF-8'?><collection xmlns='http://www.loc.gov/MARC21/slim'>" + marcxml + "</collection>"
+      @marcxml << marcxml.gsub(/<record xmlns='http:\/\/www.loc.gov\/MARC21\/slim'>/, '<record>') 
+      @marcxml = "<?xml version='1.0' encoding='UTF-8'?><collection xmlns='http://www.loc.gov/MARC21/slim'>" + marcxml + "</collection>"
       # Pretty print the unformatted marcxml for display purposes
       @marcxml = `echo "#{marcxml}" | xmllint --format -`
       
@@ -107,8 +121,8 @@ class Converter
       end
              
       marcxml_file.close!
-    else 
-       @bibframe = @marcxml = 'No catalog record found for bibid ' + @bibid    
-    end
+    #else 
+       #@bibframe = @marcxml = 'No catalog record found for bibid ' + @bibid    
+    #end
   end
 end
