@@ -71,58 +71,52 @@ class Converter
 
   def convert
 
-    #if (marcxml.start_with?('<record'))
+    @marcxml << marcxml.gsub(/<record xmlns='http:\/\/www.loc.gov\/MARC21\/slim'>/, '<record>') 
+    @marcxml = "<?xml version='1.0' encoding='UTF-8'?><collection xmlns='http://www.loc.gov/MARC21/slim'>" + marcxml + "</collection>"
+    # Pretty print the unformatted marcxml for display purposes
+    @marcxml = `echo "#{marcxml}" | xmllint --format -`
+    
+    # Send the marcxml to the LC Bibframe converter
+    # Marcxml to Bibframe conversion tools
+    saxon = File.join(Rails.root, 'lib', 'saxon', 'saxon9he.jar')
+    xquery = File.join(Rails.root, 'lib', 'marc2bibframe', 'xbin', 'saxon.xqy')
 
-      @marcxml << marcxml.gsub(/<record xmlns='http:\/\/www.loc.gov\/MARC21\/slim'>/, '<record>') 
-      @marcxml = "<?xml version='1.0' encoding='UTF-8'?><collection xmlns='http://www.loc.gov/MARC21/slim'>" + marcxml + "</collection>"
-      # Pretty print the unformatted marcxml for display purposes
-      @marcxml = `echo "#{marcxml}" | xmllint --format -`
-      
-      # Send the marcxml to the LC Bibframe converter
-      # Marcxml to Bibframe conversion tools
-      saxon = File.join(Rails.root, 'lib', 'saxon', 'saxon9he.jar')
-      xquery = File.join(Rails.root, 'lib', 'marc2bibframe', 'xbin', 'saxon.xqy')
-      
-      #tmpdir = File.join(Rails.root, 'tmp')
-      
-      # The LC Bibframe converter requires retrieving the marcxml from a file
-      # rather than a variable, so we must write the result out to a temporary
-      # file.
-      marcxml_file = Tempfile.new ['bib2bibframe-convert-marcxml-', '.xml'] 
-      File.write(marcxml_file, @marcxml)  
-      
-      method = (@serialization == 'ntriples' || 
-                @serialization == 'json') ? "'!method=text'" : ''
+    # The LC Bibframe converter requires retrieving the marcxml from a file
+    # rather than a variable, so we must write the result out to a temporary
+    # file.
+    marcxml_file = Tempfile.new ['bib2bibframe-convert-marcxml-', '.xml'] 
+    File.write(marcxml_file, @marcxml)  
+    
+    method = (@serialization == 'ntriples' || 
+              @serialization == 'json') ? "'!method=text'" : ''
 
-      turtle = @serialization == 'turtle' ? true : false
-      if turtle 
-        @serialization = 'rdfxml'
-        turtle = true
-      end
+    turtle = @serialization == 'turtle' ? true : false
+    if turtle 
+      @serialization = 'rdfxml'
+      turtle = true
+    end
+         
+    @bibframe = %x(java -cp #{saxon} net.sf.saxon.Query #{method} #{xquery} marcxmluri=#{marcxml_file.path} baseuri=#{@baseuri} serialization=#{@serialization})
+
+    # LC Bibframe converter doesn't support turtle, so write Bibframe rdfxml
+    # to a temporary file, convert to turtle, and read back into @bibframe.
+    # TODO Can we avoid writing out the rdfxml and ttl to files? Try using
+    # Tempfile class instead (see ConvertersController#export). Tried Ruby
+    # rdf gems but it's not straightforward to get all prefixes into the
+    # turtle.
+    if turtle 
+      @serialization = 'turtle'
+      rdfxml_file = Tempfile.new ['bib2bibframe-convert-rdfxml-', '.rdf']
+      File.write(rdfxml_file, @bibframe)
+      turtle_file = Tempfile.new ['bib2bibframe-convert-ttl-', '.ttl'] 
+      jarfile = File.join(Rails.root, 'lib', 'rdf2rdf-1.0.1-2.3.1.jar') 
+      @bibframe = %x(java -jar #{jarfile} #{rdfxml_file.path} #{turtle_file.path})
+      @bibframe = File.read turtle_file
+      rdfxml_file.close!
+      turtle_file.close!
+    end
            
-      @bibframe = %x(java -cp #{saxon} net.sf.saxon.Query #{method} #{xquery} marcxmluri=#{marcxml_file.path} baseuri=#{@baseuri} serialization=#{@serialization})
+    marcxml_file.close!
 
-      # LC Bibframe converter doesn't support turtle, so write Bibframe rdfxml
-      # to a temporary file, convert to turtle, and read back into @bibframe.
-      # TODO Can we avoid writing out the rdfxml and ttl to files? Try using
-      # Tempfile class instead (see ConvertersController#export). Tried Ruby
-      # rdf gems but it's not straightforward to get all prefixes into the
-      # turtle.
-      if turtle 
-        @serialization = 'turtle'
-        rdfxml_file = Tempfile.new ['bib2bibframe-convert-rdfxml-', '.rdf']
-        File.write(rdfxml_file, @bibframe)
-        turtle_file = Tempfile.new ['bib2bibframe-convert-ttl-', '.ttl'] 
-        jarfile = File.join(Rails.root, 'lib', 'rdf2rdf-1.0.1-2.3.1.jar') 
-        @bibframe = %x(java -jar #{jarfile} #{rdfxml_file.path} #{turtle_file.path})
-        @bibframe = File.read turtle_file
-        rdfxml_file.close!
-        turtle_file.close!
-      end
-             
-      marcxml_file.close!
-    #else 
-       #@bibframe = @marcxml = 'No catalog record found for bibid ' + @bibid    
-    #end
   end
 end
