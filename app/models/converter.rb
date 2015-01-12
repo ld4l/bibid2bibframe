@@ -24,8 +24,7 @@ class Converter
   # display format managed by the converter itself.
   SERIALIZATION_FORMATS = %w(json ntriples rdfxml rdfxml-raw turtle)
  
-  # TODO Maybe not all need to be attr_accessor, only attr_reader or attr_writer
-  attr_accessor :bibid, :serialization, :baseuri, :marcxml, :bibframe
+  attr_reader :bibid, :serialization, :bibframe, :marcxml
   
   # TODO This needs to change when we accept an array of bibids
   validates_numericality_of :bibid, only_integer: true, greater_than: 0, message: 'invalid: please enter a positive integer' 
