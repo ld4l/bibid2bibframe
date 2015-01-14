@@ -15,8 +15,8 @@ class Converter
   
 
   # There is a conceptual difference between this constant and that defined in 
-  # ApplicationHelper. Here the model defines what formats it accepts, while the
-  # ApplicationHelper defines formats for the views and controllers, including
+  # ConvertersHelper. Here the model defines what formats it accepts, while the
+  # ConvertersHelper defines formats for the views and controllers, including
   # their human-readable labels. Validation must occur against the model's
   # valid formats, whereas the application might deal with other formats in
   # addition.

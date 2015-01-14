@@ -63,7 +63,7 @@ class ConvertersController < ApplicationController
       datetime = Time.now.strftime('%Y%m%d-%H%M%S')
       marcxml_filename = @converter.bibid + '_marcxml_' + datetime + '.xml' 
       
-      serialization = ApplicationHelper::SERIALIZATION_FORMATS[@converter.serialization]
+      serialization = ConvertersHelper::SERIALIZATION_FORMATS[@converter.serialization]
       base_filename = @converter.bibid + '_' + serialization[:file_label] + '_' + datetime
       bibframe_filename = base_filename + '.' + serialization[:file_extension]
       zip_filename = base_filename + '.zip'
