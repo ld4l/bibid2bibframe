@@ -71,19 +71,21 @@ class Converter
 
   def convert
 
-    @marcxml << marcxml.gsub(/<record xmlns='http:\/\/www.loc.gov\/MARC21\/slim'>/, '<record>') 
-    @marcxml = "<?xml version='1.0' encoding='UTF-8'?><collection xmlns='http://www.loc.gov/MARC21/slim'>" + marcxml + "</collection>"
+    @marcxml = @marcxml.gsub(/<record xmlns='http:\/\/www.loc.gov\/MARC21\/slim'>/, '<record>') 
+    @marcxml = "<?xml version='1.0' encoding='UTF-8'?><collection xmlns='http://www.loc.gov/MARC21/slim'>" + @marcxml + "</collection>"
     # Pretty print the unformatted marcxml for display purposes
-    @marcxml = `echo "#{marcxml}" | xmllint --format -`
+    @marcxml = `echo "#{@marcxml}" | xmllint --format -`
     
-    # Send the marcxml to the LC Bibframe converter
-    # Marcxml to Bibframe conversion tools
+    # Send the marcxml to the LC Bibframe converter 
+    # MARCXML to Bibframe conversion tools
     saxon = File.join(Rails.root, 'lib', 'saxon', 'saxon9he.jar')
     xquery = File.join(Rails.root, 'lib', 'marc2bibframe', 'xbin', 'saxon.xqy')
 
-    # The LC Bibframe converter requires retrieving the marcxml from a file
-    # rather than a variable, so we must write the result out to a temporary
-    # file.
+    # The Saxon processor requires retrieving the marcxml from a file rather
+    # than a variable, so we must write the result out to a temporary file.
+    # Zorba could be used instead to retrieve directly over http without
+    # writing to a file. See https://github.com/lcnetdev/marc2bibframe.
+    # However, when export is selected we need to write marxml to file anyway.
     marcxml_file = Tempfile.new ['bib2bibframe-convert-marcxml-', '.xml'] 
     File.write(marcxml_file, @marcxml)  
     
@@ -91,10 +93,7 @@ class Converter
               @serialization == 'json') ? "'!method=text'" : ''
 
     turtle = @serialization == 'turtle' ? true : false
-    if turtle 
-      @serialization = 'rdfxml'
-      turtle = true
-    end
+    @serialization = 'rdfxml' if turtle
          
     @bibframe = %x(java -cp #{saxon} net.sf.saxon.Query #{method} #{xquery} marcxmluri=#{marcxml_file.path} baseuri=#{@baseuri} serialization=#{@serialization})
 
