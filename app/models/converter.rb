@@ -3,6 +3,10 @@
 # until caching issues are resolved.
 require 'active_model'
 
+if Rails.env == 'development'
+  require 'pry-byebug'
+end
+
 #  
 # Class name: if we extend the app to other input/output formats, can either
 # add that as an object attribute, in which case no renaming would be necessary, 
@@ -43,6 +47,7 @@ class Converter
     @bibid = config[:bibid] 
     @serialization = config[:serialization]
     @bibframe = ''
+    @marcxml = ''
 
   end
   
@@ -51,10 +56,15 @@ class Converter
     # Don't look up bibid in catalog unless other validations have passed
     if errors.empty?
 
-      # TODO Make the search url a config option? Could then be generalized to 
-      # other catalogs, if the support the .marcxml extension
-      @marcxml = %x(curl -s http://newcatalog.library.cornell.edu/catalog/#{@bibid}.marcxml)
-      
+      # TODO Make the search url a config option. Could then be generalized to 
+      # other catalogs, if they support the .marcxml extension.
+      # curl options:
+      # -s silent
+      # -L follow 3xx redirect
+      # Don't use -i to get both original and redirected headers back in the
+      # result, since then it has to be parsed out.
+      @marcxml = %x(curl -Ls https://newcatalog.library.cornell.edu/catalog/#{@bibid}.marcxml)
+
       if (! @marcxml.start_with?('<record'))    
         errors.add :bibid, 'invalid: not found in the catalog'
       end
@@ -70,7 +80,7 @@ class Converter
   # accumulate data in the log arrays, though.
 
   def convert
-
+binding.pry
     @marcxml = @marcxml.gsub(/<record xmlns='http:\/\/www.loc.gov\/MARC21\/slim'>/, '<record>') 
     @marcxml = "<?xml version='1.0' encoding='UTF-8'?><collection xmlns='http://www.loc.gov/MARC21/slim'>" + @marcxml + "</collection>"
     # Pretty print the unformatted marcxml for display purposes
@@ -87,6 +97,7 @@ class Converter
     # writing to a file. See https://github.com/lcnetdev/marc2bibframe.
     # However, when export is selected we need to write marxml to file anyway.
     marcxml_file = Tempfile.new ['bib2bibframe-convert-marcxml-', '.xml'] 
+    # @bibframe = marcxml_file.path
     File.write(marcxml_file, @marcxml)  
     
     method = (@serialization == 'ntriples' || 
@@ -95,7 +106,13 @@ class Converter
     turtle = @serialization == 'turtle' ? true : false
     @serialization = 'rdfxml' if turtle
          
-    @bibframe = %x(java -cp #{saxon} net.sf.saxon.Query #{method} #{xquery} marcxmluri=#{marcxml_file.path} baseuri=#{@baseuri} serialization=#{@serialization})
+    command = "java -cp #{saxon} net.sf.saxon.Query #{method} #{xquery} marcxmluri=#{marcxml_file.path} baseuri=#{@baseuri} serialization=#{@serialization}"
+    @bibframe = %x(#{command})
+    marcxml_file.close!
+    
+    if @bibframe.empty?
+      @bibframe = "[CONVERTER ERROR: no BIBFRAME RDF returned]"
+    end
 
     # LC Bibframe converter doesn't support turtle, so write Bibframe rdfxml
     # to a temporary file, convert to turtle, and read back into @bibframe.
@@ -114,8 +131,6 @@ class Converter
       rdfxml_file.close!
       turtle_file.close!
     end
-           
-    marcxml_file.close!
 
   end
 end
