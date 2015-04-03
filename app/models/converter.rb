@@ -80,7 +80,7 @@ class Converter
   # accumulate data in the log arrays, though.
 
   def convert
-binding.pry
+
     @marcxml = @marcxml.gsub(/<record xmlns='http:\/\/www.loc.gov\/MARC21\/slim'>/, '<record>') 
     @marcxml = "<?xml version='1.0' encoding='UTF-8'?><collection xmlns='http://www.loc.gov/MARC21/slim'>" + @marcxml + "</collection>"
     # Pretty print the unformatted marcxml for display purposes
