@@ -23,7 +23,7 @@ class ConvertersController < ApplicationController
     config = {
       # TODO Better to add this to a config file or a form input field, or
       # both, with the form field overriding the default from the config file.
-      :baseuri => 'http://ld4l.library.cornell.edu/',     
+      :baseuri => 'http://draft.ld4l.org/cornell/',     
     }.merge(converter_params).symbolize_keys!
   
     @converter = Converter.new config
@@ -63,8 +63,10 @@ class ConvertersController < ApplicationController
       datetime = Time.now.strftime('%Y%m%d-%H%M%S')
       marcxml_filename = @converter.bibid + '_marcxml_' + datetime + '.xml' 
       
+      marc2bibframe = ConvertersHelper::MARC2BIBFRAME_VERSIONS[@converter.marc2bibframe]
+            
       serialization = ConvertersHelper::SERIALIZATION_FORMATS[@converter.serialization]
-      base_filename = @converter.bibid + '_' + serialization[:file_label] + '_' + datetime
+      base_filename = 'bib-' + @converter.bibid + '_' + serialization[:file_label] + '_' + marc2bibframe[:file_label] + '_' + datetime
       bibframe_filename = base_filename + '.' + serialization[:file_extension]
       zip_filename = base_filename + '.zip'
 
@@ -97,6 +99,6 @@ class ConvertersController < ApplicationController
     # Whitelist allowable params sent to the converter model as a security 
     # measure
     def converter_params
-      params.require(:converter).permit(:bibid, :serialization)
+      params.require(:converter).permit(:bibid, :serialization, :marc2bibframe)
     end
 end

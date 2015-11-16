@@ -27,8 +27,11 @@ class Converter
   # The LC converter also accepts EXHIBITjson format, but this only works as a
   # display format managed by the converter itself.
   SERIALIZATION_FORMATS = %w(json ntriples rdfxml rdfxml-raw turtle)
+  
+  # TODO Should validate that the directories exist in lib dir
+  CONVERTER_VERSIONS = %w(marc2bibframe-2015-11-05 marc2bibframe-2015-09-25 marc2bibframe-2015-06-24-delivery1)
  
-  attr_reader :bibid, :serialization, :bibframe, :marcxml
+  attr_reader :bibid, :serialization, :bibframe, :marcxml, :marc2bibframe
   
   # TODO This needs to change when we accept an array of bibids
   validates_numericality_of :bibid, only_integer: true, greater_than: 0, message: 'invalid: please enter a positive integer' 
@@ -46,6 +49,7 @@ class Converter
     @baseuri = config[:baseuri]
     @bibid = config[:bibid] 
     @serialization = config[:serialization]
+    @marc2bibframe = config[:marc2bibframe]
     @bibframe = ''
     @marcxml = ''
 
@@ -89,7 +93,7 @@ class Converter
     # Send the marcxml to the LC Bibframe converter 
     # MARCXML to Bibframe conversion tools
     saxon = File.join(Rails.root, 'lib', 'saxon', 'saxon9he.jar')
-    xquery = File.join(Rails.root, 'lib', 'marc2bibframe', 'xbin', 'saxon.xqy')
+    xquery = File.join(Rails.root, 'lib', @marc2bibframe, 'xbin', 'saxon.xqy')
 
     # The Saxon processor requires retrieving the marcxml from a file rather
     # than a variable, so we must write the result out to a temporary file.

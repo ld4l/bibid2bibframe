@@ -39,5 +39,27 @@ module ConvertersHelper
       :weight => 3,
     },    
   }
+  
+  MARC2BIBFRAME_VERSIONS = {
+    'marc2bibframe-2015-11-05' => {
+      :form_label => '2015-11-05',
+      :file_label => 'marc2bibframe-version-2015-11-05',
+      :marc2bibframe => 'marc2bibframe-2015-11-05',
+      :weight => 0,
+    },
+    'marc2bibframe-2015-09-25' => {
+      :form_label => '2015-09-25',
+      :file_label => 'marc2bibframe-version-2015-09-25',
+      :marc2bibframe => 'marc2bibframe-2015-09-25',
+      :weight => 1,
+    },
+    'marc2bibframe-2015-06-24-delivery1' => {
+      :form_label => '2015-06-24 (version used in full catalog conversion)',
+      :file_label => 'marc2bibframe-version-2015-06-24',
+      :marc2bibframe => 'marc2bibframe-2015-06-24-delivery1',
+      :weight => 2,
+    }
+    
+  }
 
 end

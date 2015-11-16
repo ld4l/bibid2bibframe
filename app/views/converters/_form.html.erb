@@ -17,8 +17,13 @@
   </section>
   
   <section class='field'>
-    <%= f.label :format, 'Serialization format:' %>
-    <%= f.select(:serialization, ConvertersHelper::SERIALIZATION_FORMATS.sort_by { |format, value| value[:weight] }.map {|serialization, value| [value[:form_label], serialization]}) %>
+    <%= f.label :marc2bibframe, 'marc2bibframe converter version:' %>
+    <%= f.select(:marc2bibframe, ConvertersHelper::MARC2BIBFRAME_VERSIONS.sort_by { |marc2bibframe, value| value[:weight] }.map {|marc2bibframe, value| [value[:form_label], marc2bibframe]}) %>    
+  </section>  
+  
+  <section class='field'>
+    <%= f.label :serialization, 'Serialization format:' %>
+    <%= f.select(:serialization, ConvertersHelper::SERIALIZATION_FORMATS.sort_by { |serialization, value| value[:weight] }.map {|serialization, value| [value[:form_label], serialization]}) %>
   </section>
   
   <section class='field'>
