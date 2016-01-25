@@ -3,6 +3,11 @@
 <section id="show" class="content">
 
   <p>
+    <span class="label">Catalog:</span>
+    <%= ConvertersHelper::CATALOGS[@converter.catalog[:name]][:form_label]%>
+  </p>
+  
+  <p>
     <span class="label">Bibid:</span>
     <%= @converter.bibid %>
   </p>

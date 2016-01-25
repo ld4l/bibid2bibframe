@@ -30,13 +30,17 @@ class Converter
   
   # TODO Should validate that the directories exist in lib dir
   CONVERTER_VERSIONS = %w(marc2bibframe-2015-11-05 marc2bibframe-2015-09-25 marc2bibframe-2015-06-24-delivery1)
+  
+  CATALOGS = %w(cornell harvard stanford)
  
-  attr_reader :bibid, :serialization, :bibframe, :marcxml, :marc2bibframe
+  attr_reader :bibid, :bibframe, :catalog, :marc2bibframe, :marcxml, :serialization
   
   # TODO This needs to change when we accept an array of bibids
   validates_numericality_of :bibid, only_integer: true, greater_than: 0, message: 'invalid: please enter a positive integer' 
    
   validates_inclusion_of :serialization, in: SERIALIZATION_FORMATS, message: "%{value} is not a valid serialization format"
+  
+  validate :valid_catalog
   
   validate :bibid_in_catalog
   
@@ -44,37 +48,43 @@ class Converter
   def initialize config = {}
 
     # Breaks encapsulation, allowing the caller to determine the object's 
-    # attributes
+    # attributes:
     # config.each {|k,v| instance_variable_set("@#{k}",v)}
     @baseuri = config[:baseuri]
-    @bibid = config[:bibid] 
-    @serialization = config[:serialization]
     @marc2bibframe = config[:marc2bibframe]
+    @serialization = config[:serialization]    
+    @bibid = config[:bibid]
+    @catalog = config[:catalog]
+
     @bibframe = ''
     @marcxml = ''
 
   end
   
-  def bibid_in_catalog
+  def valid_catalog
+    if errors.empty?
+      if ! CATALOGS.include? @catalog[:name]
+        errors.add :catalog, 'invalid catalog'
+      end
+    end
+  end
   
+  def bibid_in_catalog
+     
     # Don't look up bibid in catalog unless other validations have passed
     if errors.empty?
-
-      # TODO Make the search url a config option. Could then be generalized to 
-      # other catalogs, if they support the .marcxml extension.
+      
+      url = @catalog[:url] + @bibid + @catalog[:url_extension]
+      
       # curl options:
       # -s silent
       # -L follow 3xx redirect
-      # Don't use -i to get both original and redirected headers back in the
-      # result, since then it has to be parsed out.
-      @marcxml = %x(curl -Ls https://newcatalog.library.cornell.edu/catalog/#{@bibid}.marcxml)
-
+      @marcxml = %x(curl -Ls #{url})
+  
       if (! @marcxml.start_with?('<record'))    
         errors.add :bibid, 'invalid: not found in the catalog'
-      end
-    
-    end
-  
+      end 
+    end   
   end
 
   # TODO Add logging: set up logs (hard-coded initially, maybe later a config
@@ -84,6 +94,8 @@ class Converter
   # accumulate data in the log arrays, though.
 
   def convert
+
+
 
     @marcxml = @marcxml.gsub(/<record xmlns='http:\/\/www.loc.gov\/MARC21\/slim'>/, '<record>') 
     @marcxml = "<?xml version='1.0' encoding='UTF-8'?><collection xmlns='http://www.loc.gov/MARC21/slim'>" + @marcxml + "</collection>"
@@ -96,11 +108,11 @@ class Converter
     xquery = File.join(Rails.root, 'lib', @marc2bibframe, 'xbin', 'saxon.xqy')
 
     # The Saxon processor requires retrieving the marcxml from a file rather
-    # than a variable, so we must write the result out to a temporary file.
-    # Zorba could be used instead to retrieve directly over http without
+    # than a variable or url, so we must write the result out to a temporary 
+    # file. Zorba could be used instead to retrieve directly over http without
     # writing to a file. See https://github.com/lcnetdev/marc2bibframe.
-    # However, when export is selected we need to write marxml to file anyway.
-    marcxml_file = Tempfile.new ['bib2bibframe-convert-marcxml-', '.xml'] 
+    # However, when export is selected we need to write marxml to a file anyway.
+    marcxml_file = Tempfile.new ['bibid2bibframe-convert-marcxml-', '.xml'] 
     # @bibframe = marcxml_file.path
     File.write(marcxml_file, @marcxml)  
     
@@ -126,9 +138,9 @@ class Converter
     # turtle.
     if turtle 
       @serialization = 'turtle'
-      rdfxml_file = Tempfile.new ['bib2bibframe-convert-rdfxml-', '.rdf']
+      rdfxml_file = Tempfile.new ['bibid2bibframe-convert-rdfxml-', '.rdf']
       File.write(rdfxml_file, @bibframe)
-      turtle_file = Tempfile.new ['bib2bibframe-convert-ttl-', '.ttl'] 
+      turtle_file = Tempfile.new ['bibid2bibframe-convert-ttl-', '.ttl'] 
       jarfile = File.join(Rails.root, 'lib', 'rdf2rdf-1.0.1-2.3.1.jar') 
       @bibframe = %x(java -jar #{jarfile} #{rdfxml_file.path} #{turtle_file.path})
       @bibframe = File.read turtle_file

@@ -12,6 +12,11 @@
   <% end %>
 
   <section class='field'>
+    <%= f.label :catalog, 'Catalog:' %>
+    <%= f.select(:catalog, ConvertersHelper::CATALOGS.sort_by { |catalog, value| value[:weight] }.map {|catalog, value| [value[:form_label], catalog]}) %>    
+  </section>  
+  
+  <section class='field'>
     <%= f.label :bibid, 'bib id:' %>
     <%= f.text_field :bibid %>
   </section>
