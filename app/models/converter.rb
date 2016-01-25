@@ -50,7 +50,6 @@ class Converter
     # Breaks encapsulation, allowing the caller to determine the object's 
     # attributes:
     # config.each {|k,v| instance_variable_set("@#{k}",v)}
-    @baseuri = config[:baseuri]
     @marc2bibframe = config[:marc2bibframe]
     @serialization = config[:serialization]    
     @bibid = config[:bibid]
@@ -122,7 +121,7 @@ class Converter
     turtle = @serialization == 'turtle' ? true : false
     @serialization = 'rdfxml' if turtle
          
-    command = "java -cp #{saxon} net.sf.saxon.Query #{method} #{xquery} marcxmluri=#{marcxml_file.path} baseuri=#{@baseuri} serialization=#{@serialization}"
+    command = "java -cp #{saxon} net.sf.saxon.Query #{method} #{xquery} marcxmluri=#{marcxml_file.path} baseuri=#{@catalog[:baseuri]} serialization=#{@serialization}"
     @bibframe = %x(#{command})
     marcxml_file.close!
     

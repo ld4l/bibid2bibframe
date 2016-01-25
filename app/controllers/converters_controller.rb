@@ -26,9 +26,9 @@ class ConvertersController < ApplicationController
     config = converter_params.to_h.symbolize_keys
     
     catalog = ConvertersHelper::CATALOGS[params['converter']['catalog']]
-    catalog = {
-      :baseuri => catalog[:baseuri],
+    catalog = {      
       :catalog => {
+        :baseuri => catalog[:baseuri],
         :name => catalog[:name],
         :url => catalog[:url],
         :url_extension => catalog[:url_extension],
