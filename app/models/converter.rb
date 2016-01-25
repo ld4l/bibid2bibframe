@@ -7,6 +7,8 @@ if Rails.env == 'development'
   require 'pry-byebug'
 end
 
+require 'net/http'
+
 #  
 # Class name: if we extend the app to other input/output formats, can either
 # add that as an object attribute, in which case no renaming would be necessary, 
@@ -64,6 +66,15 @@ class Converter
     if errors.empty?
       if ! CATALOGS.include? @catalog[:name]
         errors.add :catalog, 'invalid catalog'
+      # TODO Test catalog connection and add error message to :catalog field
+      # if cannot connect (remember 3xx also ok). Temporarily the error message
+      # is printed on the bibid.
+      else 
+        # Doesn't work
+        # http = Net::HTTP.new @catalog[:url], nil      
+        # test_url = '123' + @catalog[:url_extension]
+        # response = http.request_head test_url
+        # if response ... 
       end
     end
   end
@@ -78,10 +89,12 @@ class Converter
       # curl options:
       # -s silent
       # -L follow 3xx redirect
+      test = %x(curl -Ls @catalog[:url])
       @marcxml = %x(curl -Ls #{url})
-  
-      if (! @marcxml.start_with?('<record'))    
-        errors.add :bibid, 'invalid: not found in the catalog'
+
+      if (! @marcxml.start_with?('<record'))   
+        # TODO Catalog connection should be tested in validate_catalog 
+        errors.add :bibid, 'not found in the catalog or cannot connect to catalog'
       end 
     end   
   end
