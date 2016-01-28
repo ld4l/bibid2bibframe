@@ -8,6 +8,7 @@ if Rails.env == 'development'
 end
 
 require 'net/http'
+require 'uri'
 
 #  
 # Class name: if we extend the app to other input/output formats, can either
@@ -66,15 +67,12 @@ class Converter
     if errors.empty?
       if ! CATALOGS.include? @catalog[:name]
         errors.add :catalog, 'invalid catalog'
-      # TODO Test catalog connection and add error message to :catalog field
-      # if cannot connect (remember 3xx also ok). Temporarily the error message
-      # is printed on the bibid.
       else 
-        # Doesn't work
-        # http = Net::HTTP.new @catalog[:url], nil      
-        # test_url = '123' + @catalog[:url_extension]
-        # response = http.request_head test_url
-        # if response ... 
+        test_url = catalog[:url] + "123"
+        response = Net::HTTP.get_response(URI(test_url))
+        if  ! ( response.code[0] == "2" or response.code[0] == "3" )
+          errors.add :catalog, 'error: cannot make HTTP connection to catalog'
+        end
       end
     end
   end
