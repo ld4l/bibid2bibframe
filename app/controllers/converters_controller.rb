@@ -26,15 +26,14 @@ class ConvertersController < ApplicationController
     config = converter_params.to_h.symbolize_keys
     
     catalog = ConvertersHelper::CATALOGS[params['converter']['catalog']]
-    catalog = {      
-      :catalog => {
-        :baseuri => catalog[:baseuri],
-        :name => catalog[:name],
-        :url => catalog[:url],
-        :url_extension => catalog[:url_extension],
-      }, 
+
+    config[:catalog] = {
+      # Remove the fields related to controller/view rather than model
+      :baseuri => catalog[:baseuri],
+      :name => catalog[:name],
+      :url => catalog[:url],
+      :url_extension => catalog[:url_extension],
     }
-    config.merge! catalog
 
     @converter = Converter.new config
     

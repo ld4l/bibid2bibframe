@@ -91,8 +91,8 @@ class Converter
       # -L follow 3xx redirect
       test = %x(curl -Ls @catalog[:url])
       @marcxml = %x(curl -Ls #{url})
-
-      if (! @marcxml.start_with?('<record'))   
+      #if (! @marcxml.start_with?('<record'))   
+      if @marcxml.blank?
         # TODO Catalog connection should be tested in validate_catalog 
         errors.add :bibid, 'not found in the catalog or cannot connect to catalog'
       end 
@@ -106,10 +106,13 @@ class Converter
   # accumulate data in the log arrays, though.
 
   def convert
-
-
-
-    @marcxml = @marcxml.gsub(/<record xmlns='http:\/\/www.loc.gov\/MARC21\/slim'>/, '<record>') 
+    if @catalog[:name] == 'harvard'
+      @marcxml = @marcxml.gsub(/\n/, '')
+      @marcxml = @marcxml.tr('"', '\'')
+      @marcxml = @marcxml.sub(/<\?xml.+?>/, '')
+    end
+    
+    @marcxml = @marcxml.sub(/<record.+?>/, '<record>') 
     @marcxml = "<?xml version='1.0' encoding='UTF-8'?><collection xmlns='http://www.loc.gov/MARC21/slim'>" + @marcxml + "</collection>"
     # Pretty print the unformatted marcxml for display purposes
     @marcxml = `echo "#{@marcxml}" | xmllint --format -`
