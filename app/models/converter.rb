@@ -107,12 +107,12 @@ class Converter
 
   def convert
     if @catalog[:name] == 'harvard'
-      @marcxml = @marcxml.gsub(/\n/, '')
-      @marcxml = @marcxml.tr('"', '\'')
-      @marcxml = @marcxml.sub(/<\?xml.+?>/, '')
+      @marcxml.gsub!(/\n/, '')
+              .tr!('"', '\'')
+              .sub!(/<\?xml.+?>/, '')
     end
     
-    @marcxml = @marcxml.sub(/<record.+?>/, '<record>') 
+    @marcxml.sub!(/<record.+?>/, '<record>') 
     @marcxml = "<?xml version='1.0' encoding='UTF-8'?><collection xmlns='http://www.loc.gov/MARC21/slim'>" + @marcxml + "</collection>"
     # Pretty print the unformatted marcxml for display purposes
     @marcxml = `echo "#{@marcxml}" | xmllint --format -`
