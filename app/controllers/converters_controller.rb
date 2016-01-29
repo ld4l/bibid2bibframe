@@ -1,6 +1,9 @@
 class ConvertersController < ApplicationController
 
   require 'zip'
+  if Rails.env == 'development'
+    require 'pry-byebug'
+  end
 
   # Define the default RDF serialization for the application.
   # Note that this should not be left to the model. If there are multiple
@@ -20,14 +23,20 @@ class ConvertersController < ApplicationController
   # GET /convert.json
   def convert 
     
-    config = {
-      # TODO Better to add this to a config file or a form input field, or
-      # both, with the form field overriding the default from the config file.
-      :baseuri => 'http://draft.ld4l.org/cornell/',     
-    }.merge(converter_params).symbolize_keys!
-  
-    @converter = Converter.new config
+    config = converter_params.to_h.symbolize_keys
+    
+    catalog = ConvertersHelper::CATALOGS[params['converter']['catalog']]
 
+    config[:catalog] = {
+      # Remove the fields related to controller/view rather than model
+      :baseuri => catalog[:baseuri],
+      :name => catalog[:name],
+      :url => catalog[:url],
+      :url_extension => catalog[:url_extension],
+    }
+
+    @converter = Converter.new config
+    
     respond_to do |format|     
       if @converter.valid?  
         @converter.convert 
@@ -61,12 +70,15 @@ class ConvertersController < ApplicationController
 
       # Set filenames
       datetime = Time.now.strftime('%Y%m%d-%H%M%S')
-      marcxml_filename = @converter.bibid + '_marcxml_' + datetime + '.xml' 
+
+      catalog = ConvertersHelper::MARC2BIBFRAME_VERSIONS[@converter.catalog]
+      base_filename = catalog[:name] + '_' + @converter.bibid      
+      marcxml_filename =  base_filename + '_marcxml_' + datetime + '.xml' 
       
-      marc2bibframe = ConvertersHelper::MARC2BIBFRAME_VERSIONS[@converter.marc2bibframe]
-            
+      marc2bibframe = ConvertersHelper::MARC2BIBFRAME_VERSIONS[@converter.marc2bibframe]            
       serialization = ConvertersHelper::SERIALIZATION_FORMATS[@converter.serialization]
-      base_filename = 'bib-' + @converter.bibid + '_' + serialization[:file_label] + '_' + marc2bibframe[:file_label] + '_' + datetime
+      
+      base_filename = base_filename + '_' + serialization[:file_label] + '_' + marc2bibframe[:file_label] + '_' + datetime
       bibframe_filename = base_filename + '.' + serialization[:file_extension]
       zip_filename = base_filename + '.zip'
 
@@ -99,6 +111,6 @@ class ConvertersController < ApplicationController
     # Whitelist allowable params sent to the converter model as a security 
     # measure
     def converter_params
-      params.require(:converter).permit(:bibid, :serialization, :marc2bibframe)
+      params.require(:converter).permit(:bibid, :catalog, :serialization, :marc2bibframe)
     end
 end

@@ -3,6 +3,11 @@
 <section id="show" class="content">
 
   <p>
+    <span class="label">Catalog:</span>
+    <%= ConvertersHelper::CATALOGS[@converter.catalog[:name]][:form_label]%>
+  </p>
+  
+  <p>
     <span class="label">Bibid:</span>
     <%= @converter.bibid %>
   </p>
@@ -21,6 +26,7 @@
   # Keep all form fields filled in so it's easy to change just one value
     :bibid => @converter.bibid, 
     :serialization => @converter.serialization, 
+    :catalog => @converter.catalog[:name],
     :marc2bibframe => @converter.marc2bibframe) %></p>
     
   <section id="result">
